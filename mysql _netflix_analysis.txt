@@ -1,0 +1,2902 @@
+mysql> use netflix_analysis;
+Database changed
+mysql> show tables;
++----------------------------+
+| Tables_in_netflix_analysis |
++----------------------------+
+| journey_details            |
+| krish_data                 |
+| netflix_titles             |
+| passengers                 |
+| project_titles             |
++----------------------------+
+5 rows in set (0.00 sec)
+
+mysql> describe netflix_titles;
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| show_id      | varchar(20)  | YES  |     | NULL    |       |
+| type         | varchar(20)  | YES  |     | NULL    |       |
+| title        | varchar(255) | YES  |     | NULL    |       |
+| director     | text         | YES  |     | NULL    |       |
+| cast         | text         | YES  |     | NULL    |       |
+| country      | text         | YES  |     | NULL    |       |
+| date_added   | varchar(50)  | YES  |     | NULL    |       |
+| release_year | int          | YES  |     | NULL    |       |
+| rating       | varchar(20)  | YES  |     | NULL    |       |
+| duration     | varchar(30)  | YES  |     | NULL    |       |
+| listed_in    | text         | YES  |     | NULL    |       |
+| description  | text         | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+12 rows in set (0.00 sec)
+
+mysql> LOAD DATA LOCAL INFILE 'C:/Users/Kishore/internship.csv'
+    -> INTO TABLE krish_data
+    -> FIELDS TERMINATED BY ','
+    -> ENCLOSED BY '"'
+    -> LINES TERMINATED BY '\n'
+    -> IGNORE 1 ROWS;
+Query OK, 891 rows affected (0.10 sec)
+Records: 891  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> SELECT COUNT(*) AS total_rows
+    -> FROM krish_data;
++------------+
+| total_rows |
++------------+
+|        891 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT
+    ->     PassengerId,
+    ->     Survived,
+    ->     Pclass,
+    ->     Name,
+    ->     Sex,
+    ->     Age,
+    ->     Fare,
+    ->     Embarked
+    -> FROM krish_data
+    -> LIMIT 10;
++-------------+----------+--------+-----------------------------------------------------+--------+-------+---------+----------+
+| PassengerId | Survived | Pclass | Name                                                | Sex    | Age   | Fare    | Embarked |
++-------------+----------+--------+-----------------------------------------------------+--------+-------+---------+----------+
+       |    1 |        0 |      3 | Braund, Mr. Owen Harris                             | male   | 22.00 |  7.2500 | S
+       |    2 |        1 |      1 | Cumings, Mrs. John Bradley (Florence Briggs Thayer) | female | 38.00 | 71.2833 | C
+       |    3 |        1 |      3 | Heikkinen, Miss. Laina                              | female | 26.00 |  7.9250 | S
+       |    4 |        1 |      1 | Futrelle, Mrs. Jacques Heath (Lily May Peel)        | female | 35.00 | 53.1000 | S
+       |    5 |        0 |      3 | Allen, Mr. William Henry                            | male   | 35.00 |  8.0500 | S
+       |    6 |        0 |      3 | Moran, Mr. James                                    | male   | 28.00 |  8.4583 | Q
+       |    7 |        0 |      1 | McCarthy, Mr. Timothy J                             | male   | 54.00 | 51.8625 | S
+       |    8 |        0 |      3 | Palsson, Master. Gosta Leonard                      | male   |  2.00 | 21.0750 | S
+       |    9 |        1 |      3 | Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)   | female | 27.00 | 11.1333 | S
+       |   10 |        1 |      2 | Nasser, Mrs. Nicholas (Adele Achem)                 | female | 14.00 | 30.0708 | C
++-------------+----------+--------+-----------------------------------------------------+--------+-------+---------+----------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     MIN(Age) AS min_age,
+    ->     MAX(Age) AS max_age,
+    ->     AVG(Age) AS avg_age,
+    ->     COUNT(Age) AS non_null_age
+    -> FROM krish_data;
++---------+---------+-----------+--------------+
+| min_age | max_age | avg_age   | non_null_age |
++---------+---------+-----------+--------------+
+|    0.42 |   80.00 | 29.361582 |          891 |
++---------+---------+-----------+--------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT COUNT(*) FROM passengers;
++----------+
+| COUNT(*) |
++----------+
+|      891 |
++----------+
+1 row in set (0.00 sec)
+
+mysql> SELECT
+    ->     p.PassengerId,
+    ->     p.Name,
+    ->     p.Sex,
+    ->     p.Age,
+    ->     j.Survived,
+    ->     j.Pclass,
+    ->     j.Fare
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> LIMIT 10;
++-------------+------+----------------------+------+----------+--------+-------------+
+| PassengerId | Name | Sex                  | Age  | Survived | Pclass | Fare        |
++-------------+------+----------------------+------+----------+--------+-------------+
+|           0 | 3    | Braund, Mr. Owen Har | 0.00 |        1 |      0 |      0.0000 |
+|           1 | 1    | Cumings, Mrs. John B | 0.00 |        2 |      1 |      0.0000 |
+|           2 | 3    | Heikkinen, Miss. Lai | 0.00 |        3 |      1 |      0.0000 |
+|           3 | 1    | Futrelle, Mrs. Jacqu | 0.00 |        4 |      1 | 113803.0000 |
+|           4 | 3    | Allen, Mr. William H | 0.00 |        5 |      0 | 373450.0000 |
+|           5 | 3    | Moran, Mr. James     | 0.00 |        6 |      0 | 330877.0000 |
+|           6 | 1    | McCarthy, Mr. Timoth | 0.00 |        7 |      0 |  17463.0000 |
+|           7 | 3    | Palsson, Master. Gos | 0.00 |        8 |      0 | 349909.0000 |
+|           8 | 3    | Johnson, Mrs. Oscar  | 0.00 |        9 |      1 | 347742.0000 |
+|           9 | 2    | Nasser, Mrs. Nichola | 0.00 |       10 |      1 | 237736.0000 |
++-------------+------+----------------------+------+----------+--------+-------------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     j.Pclass,
+    ->     COUNT(*) AS total_passengers,
+    ->     SUM(j.Survived) AS survivors
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> GROUP BY j.Pclass
+    -> ORDER BY j.Pclass;
++--------+------------------+-----------+
+| Pclass | total_passengers | survivors |
++--------+------------------+-----------+
+|      0 |              549 |    245412 |
+|      1 |              342 |    151974 |
++--------+------------------+-----------+
+2 rows in set (0.01 sec)
+
+mysql> SELECT
+    ->     p.Sex,
+    ->     COUNT(*) AS total_passengers,
+    ->     SUM(j.Survived) AS survivors
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> GROUP BY p.Sex;
++----------------------+------------------+-----------+
+| Sex                  | total_passengers | survivors |
++----------------------+------------------+-----------+
+| Braund, Mr. Owen Har |                1 |         1 |
+| Cumings, Mrs. John B |                1 |         2 |
+| Heikkinen, Miss. Lai |                1 |         3 |
+| Futrelle, Mrs. Jacqu |                1 |         4 |
+| Allen, Mr. William H |                1 |         5 |
+| Moran, Mr. James     |                1 |         6 |
+| McCarthy, Mr. Timoth |                1 |         7 |
+| Palsson, Master. Gos |                1 |         8 |
+| Johnson, Mrs. Oscar  |                1 |         9 |
+| Nasser, Mrs. Nichola |                1 |        10 |
+| Sandstrom, Miss. Mar |                1 |        11 |
+| Bonnell, Miss. Eliza |                1 |        12 |
+| Saundercock, Mr. Wil |                1 |        13 |
+| Andersson, Mr. Ander |                1 |        14 |
+| Vestrom, Miss. Hulda |                1 |        15 |
+| Hewlett, Mrs. (Mary  |                1 |        16 |
+| Rice, Master. Eugene |                1 |        17 |
+| Williams, Mr. Charle |                2 |       174 |
+| Vander Planke, Mrs.  |                1 |        19 |
+| Masselmani, Mrs. Fat |                1 |        20 |
+| Fynney, Mr. Joseph J |                1 |        21 |
+| Beesley, Mr. Lawrenc |                1 |        22 |
+| McGowan, Miss. Anna  |                1 |        23 |
+| Sloper, Mr. William  |                1 |        24 |
+| Palsson, Miss. Torbo |                1 |        25 |
+| Asplund, Mrs. Carl O |                1 |        26 |
+| Emir, Mr. Farred Che |                1 |        27 |
+| Fortune, Mr. Charles |                1 |        28 |
+| O'Dwyer, Miss. Ellen |                1 |        29 |
+| Todoroff, Mr. Lalio  |                1 |        30 |
+| Uruchurtu, Don. Manu |                1 |        31 |
+| Spencer, Mrs. Willia |                1 |        32 |
+| Glynn, Miss. Mary Ag |                1 |        33 |
+| Wheadon, Mr. Edward  |                1 |        34 |
+| Meyer, Mr. Edgar Jos |                1 |        35 |
+| Holverson, Mr. Alexa |                1 |        36 |
+| Mamee, Mr. Hanna     |                1 |        37 |
+| Cann, Mr. Ernest Cha |                1 |        38 |
+| Vander Planke, Miss. |                1 |        39 |
+| Nicola-Yarred, Miss. |                1 |        40 |
+| Ahlin, Mrs. Johan (J |                1 |        41 |
+| Turpin, Mrs. William |                1 |        42 |
+| Kraeff, Mr. Theodor  |                1 |        43 |
+| Laroche, Miss. Simon |                1 |        44 |
+| Devaney, Miss. Marga |                1 |        45 |
+| Rogers, Mr. William  |                1 |        46 |
+| Lennon, Mr. Denis    |                1 |        47 |
+| O'Driscoll, Miss. Br |                1 |        48 |
+| Samaan, Mr. Youssef  |                1 |        49 |
+| Arnold-Franchi, Mrs. |                1 |        50 |
+| Panula, Master. Juha |                1 |        51 |
+| Nosworthy, Mr. Richa |                1 |        52 |
+| Harper, Mrs. Henry S |                1 |        53 |
+| Faunthorpe, Mrs. Liz |                1 |        54 |
+| Ostby, Mr. Engelhart |                1 |        55 |
+| Woolner, Mr. Hugh    |                1 |        56 |
+| Rugg, Miss. Emily    |                1 |        57 |
+| Novel, Mr. Mansouer  |                1 |        58 |
+| West, Miss. Constanc |                1 |        59 |
+| Goodwin, Master. Wil |                1 |        60 |
+| Sirayanian, Mr. Orse |                1 |        61 |
+| Icard, Miss. Amelie  |                1 |        62 |
+| Harris, Mr. Henry Bi |                1 |        63 |
+| Skoog, Master. Haral |                1 |        64 |
+| Stewart, Mr. Albert  |                1 |        65 |
+| Moubarek, Master. Ge |                1 |        66 |
+| Nye, Mrs. (Elizabeth |                1 |        67 |
+| Crease, Mr. Ernest J |                1 |        68 |
+| Andersson, Miss. Ern |                1 |        69 |
+| Kink, Mr. Vincenz    |                1 |        70 |
+| Jenkin, Mr. Stephen  |                1 |        71 |
+| Goodwin, Miss. Lilli |                1 |        72 |
+| Hood, Mr. Ambrose Jr |                1 |        73 |
+| Chronopoulos, Mr. Ap |                1 |        74 |
+| Bing, Mr. Lee        |                1 |        75 |
+| Moen, Mr. Sigurd Han |                1 |        76 |
+| Staneff, Mr. Ivan    |                1 |        77 |
+| Moutal, Mr. Rahamin  |                1 |        78 |
+| Caldwell, Master. Al |                1 |        79 |
+| Dowdell, Miss. Eliza |                1 |        80 |
+| Waelens, Mr. Achille |                1 |        81 |
+| Sheerlinck, Mr. Jan  |                1 |        82 |
+| McDermott, Miss. Bri |                1 |        83 |
+| Carrau, Mr. Francisc |                1 |        84 |
+| Ilett, Miss. Bertha  |                1 |        85 |
+| Backstrom, Mrs. Karl |                1 |        86 |
+| Ford, Mr. William Ne |                1 |        87 |
+| Slocovski, Mr. Selma |                1 |        88 |
+| Fortune, Miss. Mabel |                1 |        89 |
+| Celotti, Mr. Frances |                1 |        90 |
+| Christmann, Mr. Emil |                1 |        91 |
+| Andreasson, Mr. Paul |                1 |        92 |
+| Chaffee, Mr. Herbert |                1 |        93 |
+| Dean, Mr. Bertram Fr |                1 |        94 |
+| Coxon, Mr. Daniel    |                1 |        95 |
+| Shorney, Mr. Charles |                1 |        96 |
+| Goldschmidt, Mr. Geo |                1 |        97 |
+| Greenfield, Mr. Will |                1 |        98 |
+| Doling, Mrs. John T  |                1 |        99 |
+| Kantor, Mr. Sinai    |                1 |       100 |
+| Petranec, Miss. Mati |                1 |       101 |
+| Petroff, Mr. Pastcho |                1 |       102 |
+| White, Mr. Richard F |                1 |       103 |
+| Johansson, Mr. Gusta |                1 |       104 |
+| Gustafsson, Mr. Ande |                1 |       105 |
+| Mionoff, Mr. Stoytch |                1 |       106 |
+| Salkjelsvik, Miss. A |                1 |       107 |
+| Moss, Mr. Albert Joh |                1 |       108 |
+| Rekic, Mr. Tido      |                1 |       109 |
+| Moran, Miss. Bertha  |                1 |       110 |
+| Porter, Mr. Walter C |                1 |       111 |
+| Zabour, Miss. Hileni |                1 |       112 |
+| Barton, Mr. David Jo |                1 |       113 |
+| Jussila, Miss. Katri |                1 |       114 |
+| Attalah, Miss. Malak |                1 |       115 |
+| Pekoniemi, Mr. Edvar |                1 |       116 |
+| Connors, Mr. Patrick |                1 |       117 |
+| Turpin, Mr. William  |                1 |       118 |
+| Baxter, Mr. Quigg Ed |                1 |       119 |
+| Andersson, Miss. Ell |                1 |       120 |
+| Hickman, Mr. Stanley |                1 |       121 |
+| Moore, Mr. Leonard C |                1 |       122 |
+| Nasser, Mr. Nicholas |                1 |       123 |
+| Webber, Miss. Susan  |                1 |       124 |
+| White, Mr. Percival  |                1 |       125 |
+| Nicola-Yarred, Maste |                1 |       126 |
+| McMahon, Mr. Martin  |                1 |       127 |
+| Madsen, Mr. Fridtjof |                1 |       128 |
+| Peter, Miss. Anna    |                1 |       129 |
+| Ekstrom, Mr. Johan   |                1 |       130 |
+| Drazenoic, Mr. Jozef |                1 |       131 |
+| Coelho, Mr. Domingos |                1 |       132 |
+| Robins, Mrs. Alexand |                1 |       133 |
+| Weisz, Mrs. Leopold  |                1 |       134 |
+| Sobey, Mr. Samuel Ja |                1 |       135 |
+| Richard, Mr. Emile   |                1 |       136 |
+| Newsom, Miss. Helen  |                1 |       137 |
+| Futrelle, Mr. Jacque |                1 |       138 |
+| Osen, Mr. Olaf Elon  |                1 |       139 |
+| Giglio, Mr. Victor   |                1 |       140 |
+| Boulos, Mrs. Joseph  |                1 |       141 |
+| Nysten, Miss. Anna S |                1 |       142 |
+| Hakkarainen, Mrs. Pe |                1 |       143 |
+| Burke, Mr. Jeremiah  |                1 |       144 |
+| Andrew, Mr. Edgardo  |                1 |       145 |
+| Nicholls, Mr. Joseph |                1 |       146 |
+| Andersson, Mr. Augus |                1 |       147 |
+| Ford, Miss. Robina M |                1 |       148 |
+| Navratil, Mr. Michel |                1 |       149 |
+| Byles, Rev. Thomas R |                1 |       150 |
+| Bateman, Rev. Robert |                1 |       151 |
+| Pears, Mrs. Thomas ( |                1 |       152 |
+| Meo, Mr. Alfonzo     |                1 |       153 |
+| van Billiard, Mr. Au |                1 |       154 |
+| Olsen, Mr. Ole Marti |                1 |       155 |
+| Gilnagh, Miss. Kathe |                1 |       157 |
+| Corn, Mr. Harry      |                1 |       158 |
+| Smiljanic, Mr. Mile  |                1 |       159 |
+| Sage, Master. Thomas |                1 |       160 |
+| Cribb, Mr. John Hatf |                1 |       161 |
+| Watt, Mrs. James (El |                1 |       162 |
+| Bengtsson, Mr. John  |                1 |       163 |
+| Calic, Mr. Jovo      |                1 |       164 |
+| Panula, Master. Eino |                1 |       165 |
+| Goldsmith, Master. F |                1 |       166 |
+| Chibnall, Mrs. (Edit |                1 |       167 |
+| Skoog, Mrs. William  |                1 |       168 |
+| Baumann, Mr. John D  |                1 |       169 |
+| Ling, Mr. Lee        |                1 |       170 |
+| Van der hoef, Mr. Wy |                1 |       171 |
+| Rice, Master. Arthur |                1 |       172 |
+| Johnson, Miss. Elean |                1 |       173 |
+| Sivola, Mr. Antti Wi |                1 |       174 |
+| Smith, Mr. James Cli |                1 |       175 |
+| Klasen, Mr. Klas Alb |                1 |       176 |
+| Lefebre, Master. Hen |                1 |       177 |
+| Isham, Miss. Ann Eli |                1 |       178 |
+| Hale, Mr. Reginald   |                1 |       179 |
+| Leonard, Mr. Lionel  |                1 |       180 |
+| Sage, Miss. Constanc |                1 |       181 |
+| Pernot, Mr. Rene     |                1 |       182 |
+| Asplund, Master. Cla |                1 |       183 |
+| Becker, Master. Rich |                1 |       184 |
+| Kink-Heilmann, Miss. |                1 |       185 |
+| Rood, Mr. Hugh Rosco |                1 |       186 |
+| O'Brien, Mrs. Thomas |                1 |       187 |
+| Romaine, Mr. Charles |                1 |       188 |
+| Bourke, Mr. John     |                1 |       189 |
+| Turcin, Mr. Stjepan  |                1 |       190 |
+| Pinsky, Mrs. (Rosa)  |                1 |       191 |
+| Carbines, Mr. Willia |                1 |       192 |
+| Andersen-Jensen, Mis |                1 |       193 |
+| Navratil, Master. Mi |                1 |       194 |
+| Brown, Mrs. James Jo |                1 |       195 |
+| Lurette, Miss. Elise |                1 |       196 |
+| Mernagh, Mr. Robert  |                1 |       197 |
+| Olsen, Mr. Karl Sieg |                1 |       198 |
+| Madigan, Miss. Marga |                1 |       199 |
+| Yrois, Miss. Henriet |                1 |       200 |
+| Vande Walle, Mr. Nes |                1 |       201 |
+| Sage, Mr. Frederick  |                1 |       202 |
+| Johanson, Mr. Jakob  |                1 |       203 |
+| Youseff, Mr. Gerious |                1 |       204 |
+| Cohen, Mr. Gurshon " |                1 |       205 |
+| Strom, Miss. Telma M |                1 |       206 |
+| Backstrom, Mr. Karl  |                1 |       207 |
+| Albimona, Mr. Nassef |                1 |       208 |
+| Carr, Miss. Helen "E |                1 |       209 |
+| Blank, Mr. Henry     |                1 |       210 |
+| Ali, Mr. Ahmed       |                1 |       211 |
+| Cameron, Miss. Clear |                1 |       212 |
+| Perkin, Mr. John Hen |                1 |       213 |
+| Givard, Mr. Hans Kri |                1 |       214 |
+| Kiernan, Mr. Philip  |                1 |       215 |
+| Newell, Miss. Madele |                1 |       216 |
+| Honkanen, Miss. Elii |                1 |       217 |
+| Jacobsohn, Mr. Sidne |                1 |       218 |
+| Bazzani, Miss. Albin |                1 |       219 |
+| Harris, Mr. Walter   |                1 |       220 |
+| Sunderland, Mr. Vict |                1 |       221 |
+| Bracken, Mr. James H |                1 |       222 |
+| Green, Mr. George He |                1 |       223 |
+| Nenkoff, Mr. Christo |                1 |       224 |
+| Hoyt, Mr. Frederick  |                1 |       225 |
+| Berglund, Mr. Karl I |                1 |       226 |
+| Mellors, Mr. William |                1 |       227 |
+| Lovell, Mr. John Hal |                1 |       228 |
+| Fahlstrom, Mr. Arne  |                1 |       229 |
+| Lefebre, Miss. Mathi |                1 |       230 |
+| Harris, Mrs. Henry B |                1 |       231 |
+| Larsson, Mr. Bengt E |                1 |       232 |
+| Sjostedt, Mr. Ernst  |                1 |       233 |
+| Asplund, Miss. Lilli |                1 |       234 |
+| Leyson, Mr. Robert W |                1 |       235 |
+| Harknett, Miss. Alic |                1 |       236 |
+| Hold, Mr. Stephen    |                1 |       237 |
+| Collyer, Miss. Marjo |                1 |       238 |
+| Pengelly, Mr. Freder |                1 |       239 |
+| Hunt, Mr. George Hen |                1 |       240 |
+| Zabour, Miss. Thamin |                1 |       241 |
+| Murphy, Miss. Kather |                1 |       242 |
+| Coleridge, Mr. Regin |                1 |       243 |
+| Maenpaa, Mr. Matti A |                1 |       244 |
+| Attalah, Mr. Sleiman |                1 |       245 |
+| Minahan, Dr. William |                1 |       246 |
+| Lindahl, Miss. Agda  |                1 |       247 |
+| Hamalainen, Mrs. Wil |                1 |       248 |
+| Beckwith, Mr. Richar |                1 |       249 |
+| Carter, Rev. Ernest  |                1 |       250 |
+| Reed, Mr. James Geor |                1 |       251 |
+| Strom, Mrs. Wilhelm  |                1 |       252 |
+| Stead, Mr. William T |                1 |       253 |
+| Lobb, Mr. William Ar |                1 |       254 |
+| Rosblom, Mrs. Viktor |                1 |       255 |
+| Touma, Mrs. Darwis ( |                1 |       256 |
+| Thorne, Mrs. Gertrud |                1 |       257 |
+| Cherry, Miss. Gladys |                1 |       258 |
+| Ward, Miss. Anna     |                1 |       259 |
+| Parrish, Mrs. (Lutie |                1 |       260 |
+| Smith, Mr. Thomas    |                1 |       261 |
+| Asplund, Master. Edv |                1 |       262 |
+| Taussig, Mr. Emil    |                1 |       263 |
+| Harrison, Mr. Willia |                1 |       264 |
+| Henry, Miss. Delia   |                1 |       265 |
+| Reeves, Mr. David    |                1 |       266 |
+| Panula, Mr. Ernesti  |                1 |       267 |
+| Persson, Mr. Ernst U |                1 |       268 |
+| Graham, Mrs. William |                1 |       269 |
+| Bissette, Miss. Amel |                1 |       270 |
+| Cairns, Mr. Alexande |                1 |       271 |
+| Tornquist, Mr. Willi |                1 |       272 |
+| Mellinger, Mrs. (Eli |                1 |       273 |
+| Natsch, Mr. Charles  |                1 |       274 |
+| Healy, Miss. Hanora  |                1 |       275 |
+| Andrews, Miss. Korne |                1 |       276 |
+| Lindblom, Miss. Augu |                1 |       277 |
+| Parkes, Mr. Francis  |                1 |       278 |
+| Rice, Master. Eric   |                1 |       279 |
+| Abbott, Mrs. Stanton |                1 |       280 |
+| Duane, Mr. Frank     |                1 |       281 |
+| Olsson, Mr. Nils Joh |                1 |       282 |
+| de Pelsmaeker, Mr. A |                1 |       283 |
+| Dorking, Mr. Edward  |                1 |       284 |
+| Smith, Mr. Richard W |                1 |       285 |
+| Stankovic, Mr. Ivan  |                1 |       286 |
+| de Mulder, Mr. Theod |                1 |       287 |
+| Naidenoff, Mr. Penko |                1 |       288 |
+| Hosono, Mr. Masabumi |                1 |       289 |
+| Connolly, Miss. Kate |                1 |       290 |
+| Barber, Miss. Ellen  |                1 |       291 |
+| Bishop, Mrs. Dickins |                1 |       292 |
+| Levy, Mr. Rene Jacqu |                1 |       293 |
+| Haas, Miss. Aloisia  |                1 |       294 |
+| Mineff, Mr. Ivan     |                1 |       295 |
+| Lewy, Mr. Ervin G    |                1 |       296 |
+| Hanna, Mr. Mansour   |                1 |       297 |
+| Allison, Miss. Helen |                1 |       298 |
+| Saalfeld, Mr. Adolph |                1 |       299 |
+| Baxter, Mrs. James ( |                1 |       300 |
+| Kelly, Miss. Anna Ka |                1 |       301 |
+| McCoy, Mr. Bernard   |                1 |       302 |
+| Johnson, Mr. William |                1 |       303 |
+| Keane, Miss. Nora A  |                1 |       304 |
+| Williams, Mr. Howard |                1 |       305 |
+| Allison, Master. Hud |                1 |       306 |
+| Fleming, Miss. Marga |                1 |       307 |
+| Penasco y Castellana |                2 |       814 |
+| Abelson, Mr. Samuel  |                1 |       309 |
+| Francatelli, Miss. L |                1 |       310 |
+| Hays, Miss. Margaret |                1 |       311 |
+| Ryerson, Miss. Emily |                1 |       312 |
+| Lahtinen, Mrs. Willi |                1 |       313 |
+| Hendekovic, Mr. Ignj |                1 |       314 |
+| Hart, Mr. Benjamin   |                1 |       315 |
+| Nilsson, Miss. Helmi |                1 |       316 |
+| Kantor, Mrs. Sinai ( |                1 |       317 |
+| Moraweck, Dr. Ernest |                1 |       318 |
+| Wick, Miss. Mary Nat |                1 |       319 |
+| Spedden, Mrs. Freder |                1 |       320 |
+| Dennis, Mr. Samuel   |                1 |       321 |
+| Danoff, Mr. Yoto     |                1 |       322 |
+| Slayter, Miss. Hilda |                1 |       323 |
+| Caldwell, Mrs. Alber |                1 |       324 |
+| Sage, Mr. George Joh |                1 |       325 |
+| Young, Miss. Marie G |                1 |       326 |
+| Nysveen, Mr. Johan H |                1 |       327 |
+| Ball, Mrs. (Ada E Ha |                1 |       328 |
+| Goldsmith, Mrs. Fran |                1 |       329 |
+| Hippach, Miss. Jean  |                1 |       330 |
+| McCoy, Miss. Agnes   |                1 |       331 |
+| Partner, Mr. Austen  |                1 |       332 |
+| Graham, Mr. George E |                1 |       333 |
+| Vander Planke, Mr. L |                1 |       334 |
+| Frauenthal, Mrs. Hen |                1 |       335 |
+| Denkoff, Mr. Mitto   |                1 |       336 |
+| Pears, Mr. Thomas Cl |                1 |       337 |
+| Burns, Miss. Elizabe |                1 |       338 |
+| Dahl, Mr. Karl Edwar |                1 |       339 |
+| Blackwell, Mr. Steph |                1 |       340 |
+| Navratil, Master. Ed |                1 |       341 |
+| Fortune, Miss. Alice |                1 |       342 |
+| Collander, Mr. Erik  |                1 |       343 |
+| Sedgwick, Mr. Charle |                1 |       344 |
+| Fox, Mr. Stanley Hub |                1 |       345 |
+| Brown, Miss. Amelia  |                1 |       346 |
+| Smith, Miss. Marion  |                1 |       347 |
+| Davison, Mrs. Thomas |                1 |       348 |
+| Coutts, Master. Will |                1 |       349 |
+| Dimic, Mr. Jovan     |                1 |       350 |
+| Odahl, Mr. Nils Mart |                1 |       351 |
+| Williams-Lambert, Mr |                1 |       352 |
+| Elias, Mr. Tannous   |                1 |       353 |
+| Arnold-Franchi, Mr.  |                1 |       354 |
+| Yousif, Mr. Wazli    |                1 |       355 |
+| Vanden Steen, Mr. Le |                1 |       356 |
+| Bowerman, Miss. Elsi |                1 |       357 |
+| Funk, Miss. Annie Cl |                1 |       358 |
+| McGovern, Miss. Mary |                1 |       359 |
+| Mockler, Miss. Helen |                1 |       360 |
+| Skoog, Mr. Wilhelm   |                1 |       361 |
+| del Carlo, Mr. Sebas |                1 |       362 |
+| Barbara, Mrs. (Cathe |                1 |       363 |
+| Asim, Mr. Adola      |                1 |       364 |
+| O'Brien, Mr. Thomas  |                1 |       365 |
+| Adahl, Mr. Mauritz N |                1 |       366 |
+| Warren, Mrs. Frank M |                1 |       367 |
+| Moussa, Mrs. (Mantou |                1 |       368 |
+| Jermyn, Miss. Annie  |                1 |       369 |
+| Aubart, Mme. Leontin |                1 |       370 |
+| Harder, Mr. George A |                1 |       371 |
+| Wiklund, Mr. Jakob A |                1 |       372 |
+| Beavan, Mr. William  |                1 |       373 |
+| Ringhini, Mr. Sante  |                1 |       374 |
+| Palsson, Miss. Stina |                1 |       375 |
+| Meyer, Mrs. Edgar Jo |                1 |       376 |
+| Landergren, Miss. Au |                1 |       377 |
+| Widener, Mr. Harry E |                1 |       378 |
+| Betros, Mr. Tannous  |                1 |       379 |
+| Gustafsson, Mr. Karl |                1 |       380 |
+| Bidois, Miss. Rosali |                1 |       381 |
+| Nakid, Miss. Maria ( |                1 |       382 |
+| Tikkanen, Mr. Juho   |                1 |       383 |
+| Holverson, Mrs. Alex |                1 |       384 |
+| Plotcharsky, Mr. Vas |                1 |       385 |
+| Davies, Mr. Charles  |                1 |       386 |
+| Goodwin, Master. Sid |                1 |       387 |
+| Buss, Miss. Kate     |                1 |       388 |
+| Sadlier, Mr. Matthew |                1 |       389 |
+| Lehmann, Miss. Berth |                1 |       390 |
+| Carter, Mr. William  |                1 |       391 |
+| Jansson, Mr. Carl Ol |                1 |       392 |
+| Gustafsson, Mr. Joha |                1 |       393 |
+| Newell, Miss. Marjor |                1 |       394 |
+| Sandstrom, Mrs. Hjal |                1 |       395 |
+| Johansson, Mr. Erik  |                1 |       396 |
+| Olsson, Miss. Elina  |                1 |       397 |
+| McKane, Mr. Peter Da |                1 |       398 |
+| Pain, Dr. Alfred     |                1 |       399 |
+| Trout, Mrs. William  |                1 |       400 |
+| Niskanen, Mr. Juha   |                1 |       401 |
+| Adams, Mr. John      |                1 |       402 |
+| Jussila, Miss. Mari  |                1 |       403 |
+| Hakkarainen, Mr. Pek |                1 |       404 |
+| Oreskovic, Miss. Mar |                1 |       405 |
+| Gale, Mr. Shadrach   |                1 |       406 |
+| Widegren, Mr. Carl/C |                1 |       407 |
+| Richards, Master. Wi |                1 |       408 |
+| Birkeland, Mr. Hans  |                1 |       409 |
+| Lefebre, Miss. Ida   |                1 |       410 |
+| Sdycoff, Mr. Todor   |                1 |       411 |
+| Hart, Mr. Henry      |                1 |       412 |
+| Minahan, Miss. Daisy |                1 |       413 |
+| Cunningham, Mr. Alfr |                1 |       414 |
+| Sundman, Mr. Johan J |                1 |       415 |
+| Meek, Mrs. Thomas (A |                1 |       416 |
+| Drew, Mrs. James Viv |                1 |       417 |
+| Silven, Miss. Lyyli  |                1 |       418 |
+| Matthews, Mr. Willia |                1 |       419 |
+| Van Impe, Miss. Cath |                1 |       420 |
+| Gheorgheff, Mr. Stan |                1 |       421 |
+| Charters, Mr. David  |                1 |       422 |
+| Zimmerman, Mr. Leo   |                1 |       423 |
+| Danbom, Mrs. Ernst G |                1 |       424 |
+| Rosblom, Mr. Viktor  |                1 |       425 |
+| Wiseman, Mr. Phillip |                1 |       426 |
+| Clarke, Mrs. Charles |                1 |       427 |
+| Phillips, Miss. Kate |                1 |       428 |
+| Flynn, Mr. James     |                1 |       429 |
+| Pickard, Mr. Berk (B |                1 |       430 |
+| Bjornstrom-Steffanss |                1 |       431 |
+| Thorneycroft, Mrs. P |                1 |       432 |
+| Louch, Mrs. Charles  |                1 |       433 |
+| Kallio, Mr. Nikolai  |                1 |       434 |
+| Silvey, Mr. William  |                1 |       435 |
+| Carter, Miss. Lucile |                1 |       436 |
+| Ford, Miss. Doolina  |                1 |       437 |
+| Richards, Mrs. Sidne |                1 |       438 |
+| Fortune, Mr. Mark    |                1 |       439 |
+| Kvillner, Mr. Johan  |                1 |       440 |
+| Hart, Mrs. Benjamin  |                1 |       441 |
+| Hampe, Mr. Leon      |                1 |       442 |
+| Petterson, Mr. Johan |                1 |       443 |
+| Reynaldo, Ms. Encarn |                1 |       444 |
+| Johannesen-Bratthamm |                1 |       445 |
+| Dodge, Master. Washi |                1 |       446 |
+| Mellinger, Miss. Mad |                1 |       447 |
+| Seward, Mr. Frederic |                1 |       448 |
+| Baclini, Miss. Marie |                1 |       449 |
+| Peuchen, Major. Arth |                1 |       450 |
+| West, Mr. Edwy Arthu |                1 |       451 |
+| Hagland, Mr. Ingvald |                1 |       452 |
+| Foreman, Mr. Benjami |                1 |       453 |
+| Goldenberg, Mr. Samu |                1 |       454 |
+| Peduzzi, Mr. Joseph  |                1 |       455 |
+| Jalsevac, Mr. Ivan   |                1 |       456 |
+| Millet, Mr. Francis  |                1 |       457 |
+| Kenyon, Mrs. Frederi |                1 |       458 |
+| Toomey, Miss. Ellen  |                1 |       459 |
+| O'Connor, Mr. Mauric |                1 |       460 |
+| Anderson, Mr. Harry  |                1 |       461 |
+| Morley, Mr. William  |                1 |       462 |
+| Gee, Mr. Arthur H    |                1 |       463 |
+| Milling, Mr. Jacob C |                1 |       464 |
+| Maisner, Mr. Simon   |                1 |       465 |
+| Goncalves, Mr. Manue |                1 |       466 |
+| Campbell, Mr. Willia |                1 |       467 |
+| Smart, Mr. John Mont |                1 |       468 |
+| Scanlan, Mr. James   |                1 |       469 |
+| Baclini, Miss. Helen |                1 |       470 |
+| Keefe, Mr. Arthur    |                1 |       471 |
+| Cacic, Mr. Luka      |                1 |       472 |
+| West, Mrs. Edwy Arth |                1 |       473 |
+| Jerwan, Mrs. Amin S  |                1 |       474 |
+| Strandberg, Miss. Id |                1 |       475 |
+| Clifford, Mr. George |                1 |       476 |
+| Renouf, Mr. Peter He |                1 |       477 |
+| Braund, Mr. Lewis Ri |                1 |       478 |
+| Karlsson, Mr. Nils A |                1 |       479 |
+| Hirvonen, Miss. Hild |                1 |       480 |
+| Goodwin, Master. Har |                1 |       481 |
+| Frost, Mr. Anthony W |                1 |       482 |
+| Rouse, Mr. Richard H |                1 |       483 |
+| Turkula, Mrs. (Hedwi |                1 |       484 |
+| Bishop, Mr. Dickinso |                1 |       485 |
+| Lefebre, Miss. Jeann |                1 |       486 |
+| Hoyt, Mrs. Frederick |                1 |       487 |
+| Kent, Mr. Edward Aus |                1 |       488 |
+| Somerton, Mr. Franci |                1 |       489 |
+| Coutts, Master. Eden |                1 |       490 |
+| Hagland, Mr. Konrad  |                1 |       491 |
+| Windelov, Mr. Einar  |                1 |       492 |
+| Molson, Mr. Harry Ma |                1 |       493 |
+| Artagaveytia, Mr. Ra |                1 |       494 |
+| Stanley, Mr. Edward  |                1 |       495 |
+| Yousseff, Mr. Geriou |                1 |       496 |
+| Eustis, Miss. Elizab |                1 |       497 |
+| Shellard, Mr. Freder |                1 |       498 |
+| Allison, Mrs. Hudson |                1 |       499 |
+| Svensson, Mr. Olof   |                1 |       500 |
+| Calic, Mr. Petar     |                1 |       501 |
+| Canavan, Miss. Mary  |                1 |       502 |
+| O'Sullivan, Miss. Br |                1 |       503 |
+| Laitinen, Miss. Kris |                1 |       504 |
+| Maioni, Miss. Robert |                1 |       505 |
+| Quick, Mrs. Frederic |                1 |       507 |
+| Bradley, Mr. George  |                1 |       508 |
+| Olsen, Mr. Henry Mar |                1 |       509 |
+| Lang, Mr. Fang       |                1 |       510 |
+| Daly, Mr. Eugene Pat |                1 |       511 |
+| Webber, Mr. James    |                1 |       512 |
+| McGough, Mr. James R |                1 |       513 |
+| Rothschild, Mrs. Mar |                1 |       514 |
+| Coleff, Mr. Satio    |                1 |       515 |
+| Walker, Mr. William  |                1 |       516 |
+| Lemore, Mrs. (Amelia |                1 |       517 |
+| Ryan, Mr. Patrick    |                1 |       518 |
+| Angle, Mrs. William  |                1 |       519 |
+| Pavlovic, Mr. Stefo  |                1 |       520 |
+| Perreault, Miss. Ann |                1 |       521 |
+| Vovk, Mr. Janko      |                1 |       522 |
+| Lahoud, Mr. Sarkis   |                1 |       523 |
+| Hippach, Mrs. Louis  |                1 |       524 |
+| Kassem, Mr. Fared    |                1 |       525 |
+| Farrell, Mr. James   |                1 |       526 |
+| Ridsdale, Miss. Lucy |                1 |       527 |
+| Farthing, Mr. John   |                1 |       528 |
+| Salonen, Mr. Johan W |                1 |       529 |
+| Hocking, Mr. Richard |                1 |       530 |
+| Quick, Miss. Phyllis |                1 |       531 |
+| Toufik, Mr. Nakli    |                1 |       532 |
+| Elias, Mr. Joseph Jr |                1 |       533 |
+| Peter, Mrs. Catherin |                1 |       534 |
+| Cacic, Miss. Marija  |                1 |       535 |
+| Hart, Miss. Eva Miri |                1 |       536 |
+| Butt, Major. Archiba |                1 |       537 |
+| LeRoy, Miss. Bertha  |                1 |       538 |
+| Risien, Mr. Samuel B |                1 |       539 |
+| Frolicher, Miss. Hed |                1 |       540 |
+| Crosby, Miss. Harrie |                1 |       541 |
+| Andersson, Miss. Ing |                1 |       542 |
+| Andersson, Miss. Sig |                1 |       543 |
+| Beane, Mr. Edward    |                1 |       544 |
+| Douglas, Mr. Walter  |                1 |       545 |
+| Nicholson, Mr. Arthu |                1 |       546 |
+| Beane, Mrs. Edward ( |                1 |       547 |
+| Padro y Manent, Mr.  |                1 |       548 |
+| Goldsmith, Mr. Frank |                1 |       549 |
+| Davies, Master. John |                1 |       550 |
+| Thayer, Mr. John Bor |                2 |      1250 |
+| Sharp, Mr. Percival  |                1 |       552 |
+| O'Brien, Mr. Timothy |                1 |       553 |
+| Leeni, Mr. Fahim ("P |                1 |       554 |
+| Ohman, Miss. Velin   |                1 |       555 |
+| Wright, Mr. George   |                1 |       556 |
+| Duff Gordon, Lady. ( |                1 |       557 |
+| Robbins, Mr. Victor  |                1 |       558 |
+| Taussig, Mrs. Emil ( |                1 |       559 |
+| de Messemaeker, Mrs. |                1 |       560 |
+| Morrow, Mr. Thomas R |                1 |       561 |
+| Sivic, Mr. Husein    |                1 |       562 |
+| Norman, Mr. Robert D |                1 |       563 |
+| Simmons, Mr. John    |                1 |       564 |
+| Meanwell, Miss. (Mar |                1 |       565 |
+| Davies, Mr. Alfred J |                1 |       566 |
+| Stoytcheff, Mr. Ilia |                1 |       567 |
+| Palsson, Mrs. Nils ( |                1 |       568 |
+| Doharr, Mr. Tannous  |                1 |       569 |
+| Jonsson, Mr. Carl    |                1 |       570 |
+| Harris, Mr. George   |                1 |       571 |
+| Appleton, Mrs. Edwar |                1 |       572 |
+| Flynn, Mr. John Irwi |                1 |       573 |
+| Kelly, Miss. Mary    |                1 |       574 |
+| Rush, Mr. Alfred Geo |                1 |       575 |
+| Patchett, Mr. George |                1 |       576 |
+| Garside, Miss. Ethel |                1 |       577 |
+| Silvey, Mrs. William |                1 |       578 |
+| Caram, Mrs. Joseph ( |                1 |       579 |
+| Jussila, Mr. Eiriik  |                1 |       580 |
+| Christy, Miss. Julie |                1 |       581 |
+| Thayer, Mrs. John Bo |                1 |       582 |
+| Downton, Mr. William |                1 |       583 |
+| Ross, Mr. John Hugo  |                1 |       584 |
+| Paulner, Mr. Uscher  |                1 |       585 |
+| Taussig, Miss. Ruth  |                1 |       586 |
+| Jarvis, Mr. John Den |                1 |       587 |
+| Frolicher-Stehli, Mr |                1 |       588 |
+| Gilinski, Mr. Elieze |                1 |       589 |
+| Murdlin, Mr. Joseph  |                1 |       590 |
+| Rintamaki, Mr. Matti |                1 |       591 |
+| Stephenson, Mrs. Wal |                1 |       592 |
+| Elsbury, Mr. William |                1 |       593 |
+| Bourke, Miss. Mary   |                1 |       594 |
+| Chapman, Mr. John He |                1 |       595 |
+| Van Impe, Mr. Jean B |                1 |       596 |
+| Leitch, Miss. Jessie |                1 |       597 |
+| Johnson, Mr. Alfred  |                1 |       598 |
+| Boulos, Mr. Hanna    |                1 |       599 |
+| Duff Gordon, Sir. Co |                1 |       600 |
+| Jacobsohn, Mrs. Sidn |                1 |       601 |
+| Slabenoff, Mr. Petco |                1 |       602 |
+| Harrington, Mr. Char |                1 |       603 |
+| Torber, Mr. Ernst Wi |                1 |       604 |
+| Homer, Mr. Harry ("M |                1 |       605 |
+| Lindell, Mr. Edvard  |                1 |       606 |
+| Karaic, Mr. Milan    |                1 |       607 |
+| Daniel, Mr. Robert W |                1 |       608 |
+| Laroche, Mrs. Joseph |                1 |       609 |
+| Shutes, Miss. Elizab |                1 |       610 |
+| Andersson, Mrs. Ande |                1 |       611 |
+| Jardin, Mr. Jose Net |                1 |       612 |
+| Murphy, Miss. Margar |                1 |       613 |
+| Horgan, Mr. John     |                1 |       614 |
+| Brocklebank, Mr. Wil |                1 |       615 |
+| Herman, Miss. Alice  |                1 |       616 |
+| Danbom, Mr. Ernst Gi |                1 |       617 |
+| Lobb, Mrs. William A |                1 |       618 |
+| Becker, Miss. Marion |                1 |       619 |
+| Gavey, Mr. Lawrence  |                1 |       620 |
+| Yasbeck, Mr. Antoni  |                1 |       621 |
+| Kimball, Mr. Edwin N |                1 |       622 |
+| Nakid, Mr. Sahid     |                1 |       623 |
+| Hansen, Mr. Henry Da |                1 |       624 |
+| Bowen, Mr. David Joh |                1 |       625 |
+| Sutton, Mr. Frederic |                1 |       626 |
+| Kirkland, Rev. Charl |                1 |       627 |
+| Longley, Miss. Gretc |                1 |       628 |
+| Bostandyeff, Mr. Gue |                1 |       629 |
+| O'Connell, Mr. Patri |                1 |       630 |
+| Barkworth, Mr. Alger |                1 |       631 |
+| Lundahl, Mr. Johan S |                1 |       632 |
+| Stahelin-Maeglin, Dr |                1 |       633 |
+| Parr, Mr. William He |                1 |       634 |
+| Skoog, Miss. Mabel   |                1 |       635 |
+| Davis, Miss. Mary    |                1 |       636 |
+| Leinonen, Mr. Antti  |                1 |       637 |
+| Collyer, Mr. Harvey  |                1 |       638 |
+| Panula, Mrs. Juha (M |                1 |       639 |
+| Thorneycroft, Mr. Pe |                1 |       640 |
+| Jensen, Mr. Hans Ped |                1 |       641 |
+| Sagesser, Mlle. Emma |                1 |       642 |
+| Skoog, Miss. Margit  |                1 |       643 |
+| Foo, Mr. Choong      |                1 |       644 |
+| Baclini, Miss. Eugen |                1 |       645 |
+| Harper, Mr. Henry Sl |                1 |       646 |
+| Cor, Mr. Liudevit    |                1 |       647 |
+| Simonius-Blumer, Col |                1 |       648 |
+| Willey, Mr. Edward   |                1 |       649 |
+| Stanley, Miss. Amy Z |                1 |       650 |
+| Mitkoff, Mr. Mito    |                1 |       651 |
+| Doling, Miss. Elsie  |                1 |       652 |
+| Kalvik, Mr. Johannes |                1 |       653 |
+| O'Leary, Miss. Hanor |                1 |       654 |
+| Hegarty, Miss. Hanor |                1 |       655 |
+| Hickman, Mr. Leonard |                1 |       656 |
+| Radeff, Mr. Alexande |                1 |       657 |
+| Bourke, Mrs. John (C |                1 |       658 |
+| Eitemiller, Mr. Geor |                1 |       659 |
+| Newell, Mr. Arthur W |                1 |       660 |
+| Frauenthal, Dr. Henr |                1 |       661 |
+| Badt, Mr. Mohamed    |                1 |       662 |
+| Colley, Mr. Edward P |                1 |       663 |
+| Coleff, Mr. Peju     |                1 |       664 |
+| Lindqvist, Mr. Eino  |                1 |       665 |
+| Hickman, Mr. Lewis   |                1 |       666 |
+| Butler, Mr. Reginald |                1 |       667 |
+| Rommetvedt, Mr. Knud |                1 |       668 |
+| Cook, Mr. Jacob      |                1 |       669 |
+| Taylor, Mrs. Elmer Z |                1 |       670 |
+| Brown, Mrs. Thomas W |                1 |       671 |
+| Davidson, Mr. Thornt |                1 |       672 |
+| Mitchell, Mr. Henry  |                1 |       673 |
+| Wilhelms, Mr. Charle |                1 |       674 |
+| Watson, Mr. Ennis Ha |                1 |       675 |
+| Edvardsson, Mr. Gust |                1 |       676 |
+| Sawyer, Mr. Frederic |                1 |       677 |
+| Turja, Miss. Anna So |                1 |       678 |
+| Goodwin, Mrs. Freder |                1 |       679 |
+| Cardeza, Mr. Thomas  |                1 |       680 |
+| Peters, Miss. Katie  |                1 |       681 |
+| Hassab, Mr. Hammad   |                1 |       682 |
+| Olsvigen, Mr. Thor A |                1 |       683 |
+| Goodwin, Mr. Charles |                1 |       684 |
+| Brown, Mr. Thomas Wi |                1 |       685 |
+| Laroche, Mr. Joseph  |                1 |       686 |
+| Panula, Mr. Jaako Ar |                1 |       687 |
+| Dakic, Mr. Branko    |                1 |       688 |
+| Fischer, Mr. Eberhar |                1 |       689 |
+| Madill, Miss. George |                1 |       690 |
+| Dick, Mr. Albert Adr |                1 |       691 |
+| Karun, Miss. Manca   |                1 |       692 |
+| Lam, Mr. Ali         |                1 |       693 |
+| Saad, Mr. Khalil     |                1 |       694 |
+| Weir, Col. John      |                1 |       695 |
+| Chapman, Mr. Charles |                1 |       696 |
+| Kelly, Mr. James     |                1 |       697 |
+| Mullens, Miss. Kathe |                1 |       698 |
+| Humblen, Mr. Adolf M |                1 |       700 |
+| Astor, Mrs. John Jac |                1 |       701 |
+| Silverthorne, Mr. Sp |                1 |       702 |
+| Barbara, Miss. Saiid |                1 |       703 |
+| Gallagher, Mr. Marti |                1 |       704 |
+| Hansen, Mr. Henrik J |                1 |       705 |
+| Morley, Mr. Henry Sa |                1 |       706 |
+| Kelly, Mrs. Florence |                1 |       707 |
+| Calderhead, Mr. Edwa |                1 |       708 |
+| Cleaver, Miss. Alice |                1 |       709 |
+| Moubarek, Master. Ha |                1 |       710 |
+| Mayne, Mlle. Berthe  |                1 |       711 |
+| Klaber, Mr. Herman   |                1 |       712 |
+| Taylor, Mr. Elmer Ze |                1 |       713 |
+| Larsson, Mr. August  |                1 |       714 |
+| Greenberg, Mr. Samue |                1 |       715 |
+| Soholt, Mr. Peter An |                1 |       716 |
+| Endres, Miss. Caroli |                1 |       717 |
+| Troutt, Miss. Edwina |                1 |       718 |
+| McEvoy, Mr. Michael  |                1 |       719 |
+| Johnson, Mr. Malkolm |                1 |       720 |
+| Harper, Miss. Annie  |                1 |       721 |
+| Jensen, Mr. Svend La |                1 |       722 |
+| Gillespie, Mr. Willi |                1 |       723 |
+| Hodges, Mr. Henry Pr |                1 |       724 |
+| Chambers, Mr. Norman |                1 |       725 |
+| Oreskovic, Mr. Luka  |                1 |       726 |
+| Renouf, Mrs. Peter H |                1 |       727 |
+| Mannion, Miss. Marga |                1 |       728 |
+| Bryhl, Mr. Kurt Arno |                1 |       729 |
+| Ilmakangas, Miss. Pi |                1 |       730 |
+| Allen, Miss. Elisabe |                1 |       731 |
+| Hassan, Mr. Houssein |                1 |       732 |
+| Knight, Mr. Robert J |                1 |       733 |
+| Berriman, Mr. Willia |                1 |       734 |
+| Troupiansky, Mr. Mos |                1 |       735 |
+| Williams, Mr. Leslie |                1 |       736 |
+| Ford, Mrs. Edward (M |                1 |       737 |
+| Lesurer, Mr. Gustave |                1 |       738 |
+| Ivanoff, Mr. Kanio   |                1 |       739 |
+| Nankoff, Mr. Minko   |                1 |       740 |
+| Hawksford, Mr. Walte |                1 |       741 |
+| Cavendish, Mr. Tyrel |                1 |       742 |
+| Ryerson, Miss. Susan |                1 |       743 |
+| McNamee, Mr. Neal    |                1 |       744 |
+| Stranden, Mr. Juho   |                1 |       745 |
+| Crosby, Capt. Edward |                1 |       746 |
+| Abbott, Mr. Rossmore |                1 |       747 |
+| Sinkkonen, Miss. Ann |                1 |       748 |
+| Marvin, Mr. Daniel W |                1 |       749 |
+| Connaghton, Mr. Mich |                1 |       750 |
+| Wells, Miss. Joan    |                1 |       751 |
+| Moor, Master. Meier  |                1 |       752 |
+| Vande Velde, Mr. Joh |                1 |       753 |
+| Jonkoff, Mr. Lalio   |                1 |       754 |
+| Herman, Mrs. Samuel  |                1 |       755 |
+| Hamalainen, Master.  |                1 |       756 |
+| Carlsson, Mr. August |                1 |       757 |
+| Bailey, Mr. Percy An |                1 |       758 |
+| Theobald, Mr. Thomas |                1 |       759 |
+| Rothes, the Countess |                1 |       760 |
+| Garfirth, Mr. John   |                1 |       761 |
+| Nirva, Mr. Iisakki A |                1 |       762 |
+| Barah, Mr. Hanna Ass |                1 |       763 |
+| Carter, Mrs. William |                1 |       764 |
+| Eklund, Mr. Hans Lin |                1 |       765 |
+| Hogeboom, Mrs. John  |                1 |       766 |
+| Brewe, Dr. Arthur Ja |                1 |       767 |
+| Mangan, Miss. Mary   |                1 |       768 |
+| Moran, Mr. Daniel J  |                1 |       769 |
+| Gronnestad, Mr. Dani |                1 |       770 |
+| Lievens, Mr. Rene Ai |                1 |       771 |
+| Jensen, Mr. Niels Pe |                1 |       772 |
+| Mack, Mrs. (Mary)    |                1 |       773 |
+| Elias, Mr. Dibo      |                1 |       774 |
+| Hocking, Mrs. Elizab |                1 |       775 |
+| Myhrman, Mr. Pehr Fa |                1 |       776 |
+| Tobin, Mr. Roger     |                1 |       777 |
+| Emanuel, Miss. Virgi |                1 |       778 |
+| Kilgannon, Mr. Thoma |                1 |       779 |
+| Robert, Mrs. Edward  |                1 |       780 |
+| Ayoub, Miss. Banoura |                1 |       781 |
+| Dick, Mrs. Albert Ad |                1 |       782 |
+| Long, Mr. Milton Cly |                1 |       783 |
+| Johnston, Mr. Andrew |                1 |       784 |
+| Ali, Mr. William     |                1 |       785 |
+| Harmer, Mr. Abraham  |                1 |       786 |
+| Sjoblom, Miss. Anna  |                1 |       787 |
+| Rice, Master. George |                1 |       788 |
+| Dean, Master. Bertra |                1 |       789 |
+| Guggenheim, Mr. Benj |                1 |       790 |
+| Keane, Mr. Andrew "A |                1 |       791 |
+| Gaskell, Mr. Alfred  |                1 |       792 |
+| Sage, Miss. Stella A |                1 |       793 |
+| Hoyt, Mr. William Fi |                1 |       794 |
+| Dantcheff, Mr. Risti |                1 |       795 |
+| Otter, Mr. Richard   |                1 |       796 |
+| Leader, Dr. Alice (F |                1 |       797 |
+| Osman, Mrs. Mara     |                1 |       798 |
+| Ibrahim Shawah, Mr.  |                1 |       799 |
+| Van Impe, Mrs. Jean  |                1 |       800 |
+| Ponesell, Mr. Martin |                1 |       801 |
+| Collyer, Mrs. Harvey |                1 |       802 |
+| Carter, Master. Will |                1 |       803 |
+| Thomas, Master. Assa |                1 |       804 |
+| Hedman, Mr. Oskar Ar |                1 |       805 |
+| Johansson, Mr. Karl  |                1 |       806 |
+| Andrews, Mr. Thomas  |                1 |       807 |
+| Pettersson, Miss. El |                1 |       808 |
+| Meyer, Mr. August    |                1 |       809 |
+| Chambers, Mrs. Norma |                1 |       810 |
+| Alexander, Mr. Willi |                1 |       811 |
+| Lester, Mr. James    |                1 |       812 |
+| Slemen, Mr. Richard  |                1 |       813 |
+| Andersson, Miss. Ebb |                1 |       814 |
+| Tomlin, Mr. Ernest P |                1 |       815 |
+| Fry, Mr. Richard     |                1 |       816 |
+| Heininen, Miss. Wend |                1 |       817 |
+| Mallet, Mr. Albert   |                1 |       818 |
+| Holm, Mr. John Fredr |                1 |       819 |
+| Skoog, Master. Karl  |                1 |       820 |
+| Hays, Mrs. Charles M |                1 |       821 |
+| Lulic, Mr. Nikola    |                1 |       822 |
+| Reuchlin, Jonkheer.  |                1 |       823 |
+| Moor, Mrs. (Beila)   |                1 |       824 |
+| Panula, Master. Urho |                1 |       825 |
+| Flynn, Mr. John      |                1 |       826 |
+| Lam, Mr. Len         |                1 |       827 |
+| Mallet, Master. Andr |                1 |       828 |
+| McCormack, Mr. Thoma |                1 |       829 |
+| Stone, Mrs. George N |                1 |       830 |
+| Yasbeck, Mrs. Antoni |                1 |       831 |
+| Richards, Master. Ge |                1 |       832 |
+| Saad, Mr. Amin       |                1 |       833 |
+| Augustsson, Mr. Albe |                1 |       834 |
+| Allum, Mr. Owen Geor |                1 |       835 |
+| Compton, Miss. Sara  |                1 |       836 |
+| Pasic, Mr. Jakob     |                1 |       837 |
+| Sirota, Mr. Maurice  |                1 |       838 |
+| Chip, Mr. Chang      |                1 |       839 |
+| Marechal, Mr. Pierre |                1 |       840 |
+| Alhomaki, Mr. Ilmari |                1 |       841 |
+| Mudd, Mr. Thomas Cha |                1 |       842 |
+| Serepeca, Miss. Augu |                1 |       843 |
+| Lemberopolous, Mr. P |                1 |       844 |
+| Culumovic, Mr. Jeso  |                1 |       845 |
+| Abbing, Mr. Anthony  |                1 |       846 |
+| Sage, Mr. Douglas Bu |                1 |       847 |
+| Markoff, Mr. Marin   |                1 |       848 |
+| Harper, Rev. John    |                1 |       849 |
+| Goldenberg, Mrs. Sam |                1 |       850 |
+| Andersson, Master. S |                1 |       851 |
+| Svensson, Mr. Johan  |                1 |       852 |
+| Boulos, Miss. Nourel |                1 |       853 |
+| Lines, Miss. Mary Co |                1 |       854 |
+| Carter, Mrs. Ernest  |                1 |       855 |
+| Aks, Mrs. Sam (Leah  |                1 |       856 |
+| Wick, Mrs. George De |                1 |       857 |
+| Daly, Mr. Peter Deni |                1 |       858 |
+| Baclini, Mrs. Solomo |                1 |       859 |
+| Razi, Mr. Raihed     |                1 |       860 |
+| Hansen, Mr. Claus Pe |                1 |       861 |
+| Giles, Mr. Frederick |                1 |       862 |
+| Swift, Mrs. Frederic |                1 |       863 |
+| Sage, Miss. Dorothy  |                1 |       864 |
+| Gill, Mr. John Willi |                1 |       865 |
+| Bystrom, Mrs. (Karol |                1 |       866 |
+| Duran y More, Miss.  |                1 |       867 |
+| Roebling, Mr. Washin |                1 |       868 |
+| van Melkebeke, Mr. P |                1 |       869 |
+| Johnson, Master. Har |                1 |       870 |
+| Balkic, Mr. Cerin    |                1 |       871 |
+| Beckwith, Mrs. Richa |                1 |       872 |
+| Carlsson, Mr. Frans  |                1 |       873 |
+| Vander Cruyssen, Mr. |                1 |       874 |
+| Abelson, Mrs. Samuel |                1 |       875 |
+| Najib, Miss. Adele K |                1 |       876 |
+| Gustafsson, Mr. Alfr |                1 |       877 |
+| Petroff, Mr. Nedelio |                1 |       878 |
+| Laleff, Mr. Kristo   |                1 |       879 |
+| Potter, Mrs. Thomas  |                1 |       880 |
+| Shelley, Mrs. Willia |                1 |       881 |
+| Markun, Mr. Johann   |                1 |       882 |
+| Dahlberg, Miss. Gerd |                1 |       883 |
+| Banfield, Mr. Freder |                1 |       884 |
+| Sutehall, Mr. Henry  |                1 |       885 |
+| Rice, Mrs. William ( |                1 |       886 |
+| Montvila, Rev. Juoza |                1 |       887 |
+| Graham, Miss. Margar |                1 |       888 |
+| Johnston, Miss. Cath |                1 |       889 |
+| Behr, Mr. Karl Howel |                1 |       890 |
+| Dooley, Mr. Patrick  |                1 |       891 |
++----------------------+------------------+-----------+
+888 rows in set (0.01 sec)
+
+mysql> SELECT
+    ->     p.Sex,
+    ->     COUNT(*) AS total_passengers,
+    ->     SUM(j.Survived) AS survivors,
+    ->     ROUND(SUM(j.Survived) * 100.0 / COUNT(*), 2) AS survival_rate
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> GROUP BY p.Sex;
++----------------------+------------------+-----------+---------------+
+| Sex                  | total_passengers | survivors | survival_rate |
++----------------------+------------------+-----------+---------------+
+| Braund, Mr. Owen Har |                1 |         1 |        100.00 |
+| Cumings, Mrs. John B |                1 |         2 |        200.00 |
+| Heikkinen, Miss. Lai |                1 |         3 |        300.00 |
+| Futrelle, Mrs. Jacqu |                1 |         4 |        400.00 |
+| Allen, Mr. William H |                1 |         5 |        500.00 |
+| Moran, Mr. James     |                1 |         6 |        600.00 |
+| McCarthy, Mr. Timoth |                1 |         7 |        700.00 |
+| Palsson, Master. Gos |                1 |         8 |        800.00 |
+| Johnson, Mrs. Oscar  |                1 |         9 |        900.00 |
+| Nasser, Mrs. Nichola |                1 |        10 |       1000.00 |
+| Sandstrom, Miss. Mar |                1 |        11 |       1100.00 |
+| Bonnell, Miss. Eliza |                1 |        12 |       1200.00 |
+| Saundercock, Mr. Wil |                1 |        13 |       1300.00 |
+| Andersson, Mr. Ander |                1 |        14 |       1400.00 |
+| Vestrom, Miss. Hulda |                1 |        15 |       1500.00 |
+| Hewlett, Mrs. (Mary  |                1 |        16 |       1600.00 |
+| Rice, Master. Eugene |                1 |        17 |       1700.00 |
+| Williams, Mr. Charle |                2 |       174 |       8700.00 |
+| Vander Planke, Mrs.  |                1 |        19 |       1900.00 |
+| Masselmani, Mrs. Fat |                1 |        20 |       2000.00 |
+| Fynney, Mr. Joseph J |                1 |        21 |       2100.00 |
+| Beesley, Mr. Lawrenc |                1 |        22 |       2200.00 |
+| McGowan, Miss. Anna  |                1 |        23 |       2300.00 |
+| Sloper, Mr. William  |                1 |        24 |       2400.00 |
+| Palsson, Miss. Torbo |                1 |        25 |       2500.00 |
+| Asplund, Mrs. Carl O |                1 |        26 |       2600.00 |
+| Emir, Mr. Farred Che |                1 |        27 |       2700.00 |
+| Fortune, Mr. Charles |                1 |        28 |       2800.00 |
+| O'Dwyer, Miss. Ellen |                1 |        29 |       2900.00 |
+| Todoroff, Mr. Lalio  |                1 |        30 |       3000.00 |
+| Uruchurtu, Don. Manu |                1 |        31 |       3100.00 |
+| Spencer, Mrs. Willia |                1 |        32 |       3200.00 |
+| Glynn, Miss. Mary Ag |                1 |        33 |       3300.00 |
+| Wheadon, Mr. Edward  |                1 |        34 |       3400.00 |
+| Meyer, Mr. Edgar Jos |                1 |        35 |       3500.00 |
+| Holverson, Mr. Alexa |                1 |        36 |       3600.00 |
+| Mamee, Mr. Hanna     |                1 |        37 |       3700.00 |
+| Cann, Mr. Ernest Cha |                1 |        38 |       3800.00 |
+| Vander Planke, Miss. |                1 |        39 |       3900.00 |
+| Nicola-Yarred, Miss. |                1 |        40 |       4000.00 |
+| Ahlin, Mrs. Johan (J |                1 |        41 |       4100.00 |
+| Turpin, Mrs. William |                1 |        42 |       4200.00 |
+| Kraeff, Mr. Theodor  |                1 |        43 |       4300.00 |
+| Laroche, Miss. Simon |                1 |        44 |       4400.00 |
+| Devaney, Miss. Marga |                1 |        45 |       4500.00 |
+| Rogers, Mr. William  |                1 |        46 |       4600.00 |
+| Lennon, Mr. Denis    |                1 |        47 |       4700.00 |
+| O'Driscoll, Miss. Br |                1 |        48 |       4800.00 |
+| Samaan, Mr. Youssef  |                1 |        49 |       4900.00 |
+| Arnold-Franchi, Mrs. |                1 |        50 |       5000.00 |
+| Panula, Master. Juha |                1 |        51 |       5100.00 |
+| Nosworthy, Mr. Richa |                1 |        52 |       5200.00 |
+| Harper, Mrs. Henry S |                1 |        53 |       5300.00 |
+| Faunthorpe, Mrs. Liz |                1 |        54 |       5400.00 |
+| Ostby, Mr. Engelhart |                1 |        55 |       5500.00 |
+| Woolner, Mr. Hugh    |                1 |        56 |       5600.00 |
+| Rugg, Miss. Emily    |                1 |        57 |       5700.00 |
+| Novel, Mr. Mansouer  |                1 |        58 |       5800.00 |
+| West, Miss. Constanc |                1 |        59 |       5900.00 |
+| Goodwin, Master. Wil |                1 |        60 |       6000.00 |
+| Sirayanian, Mr. Orse |                1 |        61 |       6100.00 |
+| Icard, Miss. Amelie  |                1 |        62 |       6200.00 |
+| Harris, Mr. Henry Bi |                1 |        63 |       6300.00 |
+| Skoog, Master. Haral |                1 |        64 |       6400.00 |
+| Stewart, Mr. Albert  |                1 |        65 |       6500.00 |
+| Moubarek, Master. Ge |                1 |        66 |       6600.00 |
+| Nye, Mrs. (Elizabeth |                1 |        67 |       6700.00 |
+| Crease, Mr. Ernest J |                1 |        68 |       6800.00 |
+| Andersson, Miss. Ern |                1 |        69 |       6900.00 |
+| Kink, Mr. Vincenz    |                1 |        70 |       7000.00 |
+| Jenkin, Mr. Stephen  |                1 |        71 |       7100.00 |
+| Goodwin, Miss. Lilli |                1 |        72 |       7200.00 |
+| Hood, Mr. Ambrose Jr |                1 |        73 |       7300.00 |
+| Chronopoulos, Mr. Ap |                1 |        74 |       7400.00 |
+| Bing, Mr. Lee        |                1 |        75 |       7500.00 |
+| Moen, Mr. Sigurd Han |                1 |        76 |       7600.00 |
+| Staneff, Mr. Ivan    |                1 |        77 |       7700.00 |
+| Moutal, Mr. Rahamin  |                1 |        78 |       7800.00 |
+| Caldwell, Master. Al |                1 |        79 |       7900.00 |
+| Dowdell, Miss. Eliza |                1 |        80 |       8000.00 |
+| Waelens, Mr. Achille |                1 |        81 |       8100.00 |
+| Sheerlinck, Mr. Jan  |                1 |        82 |       8200.00 |
+| McDermott, Miss. Bri |                1 |        83 |       8300.00 |
+| Carrau, Mr. Francisc |                1 |        84 |       8400.00 |
+| Ilett, Miss. Bertha  |                1 |        85 |       8500.00 |
+| Backstrom, Mrs. Karl |                1 |        86 |       8600.00 |
+| Ford, Mr. William Ne |                1 |        87 |       8700.00 |
+| Slocovski, Mr. Selma |                1 |        88 |       8800.00 |
+| Fortune, Miss. Mabel |                1 |        89 |       8900.00 |
+| Celotti, Mr. Frances |                1 |        90 |       9000.00 |
+| Christmann, Mr. Emil |                1 |        91 |       9100.00 |
+| Andreasson, Mr. Paul |                1 |        92 |       9200.00 |
+| Chaffee, Mr. Herbert |                1 |        93 |       9300.00 |
+| Dean, Mr. Bertram Fr |                1 |        94 |       9400.00 |
+| Coxon, Mr. Daniel    |                1 |        95 |       9500.00 |
+| Shorney, Mr. Charles |                1 |        96 |       9600.00 |
+| Goldschmidt, Mr. Geo |                1 |        97 |       9700.00 |
+| Greenfield, Mr. Will |                1 |        98 |       9800.00 |
+| Doling, Mrs. John T  |                1 |        99 |       9900.00 |
+| Kantor, Mr. Sinai    |                1 |       100 |      10000.00 |
+| Petranec, Miss. Mati |                1 |       101 |      10100.00 |
+| Petroff, Mr. Pastcho |                1 |       102 |      10200.00 |
+| White, Mr. Richard F |                1 |       103 |      10300.00 |
+| Johansson, Mr. Gusta |                1 |       104 |      10400.00 |
+| Gustafsson, Mr. Ande |                1 |       105 |      10500.00 |
+| Mionoff, Mr. Stoytch |                1 |       106 |      10600.00 |
+| Salkjelsvik, Miss. A |                1 |       107 |      10700.00 |
+| Moss, Mr. Albert Joh |                1 |       108 |      10800.00 |
+| Rekic, Mr. Tido      |                1 |       109 |      10900.00 |
+| Moran, Miss. Bertha  |                1 |       110 |      11000.00 |
+| Porter, Mr. Walter C |                1 |       111 |      11100.00 |
+| Zabour, Miss. Hileni |                1 |       112 |      11200.00 |
+| Barton, Mr. David Jo |                1 |       113 |      11300.00 |
+| Jussila, Miss. Katri |                1 |       114 |      11400.00 |
+| Attalah, Miss. Malak |                1 |       115 |      11500.00 |
+| Pekoniemi, Mr. Edvar |                1 |       116 |      11600.00 |
+| Connors, Mr. Patrick |                1 |       117 |      11700.00 |
+| Turpin, Mr. William  |                1 |       118 |      11800.00 |
+| Baxter, Mr. Quigg Ed |                1 |       119 |      11900.00 |
+| Andersson, Miss. Ell |                1 |       120 |      12000.00 |
+| Hickman, Mr. Stanley |                1 |       121 |      12100.00 |
+| Moore, Mr. Leonard C |                1 |       122 |      12200.00 |
+| Nasser, Mr. Nicholas |                1 |       123 |      12300.00 |
+| Webber, Miss. Susan  |                1 |       124 |      12400.00 |
+| White, Mr. Percival  |                1 |       125 |      12500.00 |
+| Nicola-Yarred, Maste |                1 |       126 |      12600.00 |
+| McMahon, Mr. Martin  |                1 |       127 |      12700.00 |
+| Madsen, Mr. Fridtjof |                1 |       128 |      12800.00 |
+| Peter, Miss. Anna    |                1 |       129 |      12900.00 |
+| Ekstrom, Mr. Johan   |                1 |       130 |      13000.00 |
+| Drazenoic, Mr. Jozef |                1 |       131 |      13100.00 |
+| Coelho, Mr. Domingos |                1 |       132 |      13200.00 |
+| Robins, Mrs. Alexand |                1 |       133 |      13300.00 |
+| Weisz, Mrs. Leopold  |                1 |       134 |      13400.00 |
+| Sobey, Mr. Samuel Ja |                1 |       135 |      13500.00 |
+| Richard, Mr. Emile   |                1 |       136 |      13600.00 |
+| Newsom, Miss. Helen  |                1 |       137 |      13700.00 |
+| Futrelle, Mr. Jacque |                1 |       138 |      13800.00 |
+| Osen, Mr. Olaf Elon  |                1 |       139 |      13900.00 |
+| Giglio, Mr. Victor   |                1 |       140 |      14000.00 |
+| Boulos, Mrs. Joseph  |                1 |       141 |      14100.00 |
+| Nysten, Miss. Anna S |                1 |       142 |      14200.00 |
+| Hakkarainen, Mrs. Pe |                1 |       143 |      14300.00 |
+| Burke, Mr. Jeremiah  |                1 |       144 |      14400.00 |
+| Andrew, Mr. Edgardo  |                1 |       145 |      14500.00 |
+| Nicholls, Mr. Joseph |                1 |       146 |      14600.00 |
+| Andersson, Mr. Augus |                1 |       147 |      14700.00 |
+| Ford, Miss. Robina M |                1 |       148 |      14800.00 |
+| Navratil, Mr. Michel |                1 |       149 |      14900.00 |
+| Byles, Rev. Thomas R |                1 |       150 |      15000.00 |
+| Bateman, Rev. Robert |                1 |       151 |      15100.00 |
+| Pears, Mrs. Thomas ( |                1 |       152 |      15200.00 |
+| Meo, Mr. Alfonzo     |                1 |       153 |      15300.00 |
+| van Billiard, Mr. Au |                1 |       154 |      15400.00 |
+| Olsen, Mr. Ole Marti |                1 |       155 |      15500.00 |
+| Gilnagh, Miss. Kathe |                1 |       157 |      15700.00 |
+| Corn, Mr. Harry      |                1 |       158 |      15800.00 |
+| Smiljanic, Mr. Mile  |                1 |       159 |      15900.00 |
+| Sage, Master. Thomas |                1 |       160 |      16000.00 |
+| Cribb, Mr. John Hatf |                1 |       161 |      16100.00 |
+| Watt, Mrs. James (El |                1 |       162 |      16200.00 |
+| Bengtsson, Mr. John  |                1 |       163 |      16300.00 |
+| Calic, Mr. Jovo      |                1 |       164 |      16400.00 |
+| Panula, Master. Eino |                1 |       165 |      16500.00 |
+| Goldsmith, Master. F |                1 |       166 |      16600.00 |
+| Chibnall, Mrs. (Edit |                1 |       167 |      16700.00 |
+| Skoog, Mrs. William  |                1 |       168 |      16800.00 |
+| Baumann, Mr. John D  |                1 |       169 |      16900.00 |
+| Ling, Mr. Lee        |                1 |       170 |      17000.00 |
+| Van der hoef, Mr. Wy |                1 |       171 |      17100.00 |
+| Rice, Master. Arthur |                1 |       172 |      17200.00 |
+| Johnson, Miss. Elean |                1 |       173 |      17300.00 |
+| Sivola, Mr. Antti Wi |                1 |       174 |      17400.00 |
+| Smith, Mr. James Cli |                1 |       175 |      17500.00 |
+| Klasen, Mr. Klas Alb |                1 |       176 |      17600.00 |
+| Lefebre, Master. Hen |                1 |       177 |      17700.00 |
+| Isham, Miss. Ann Eli |                1 |       178 |      17800.00 |
+| Hale, Mr. Reginald   |                1 |       179 |      17900.00 |
+| Leonard, Mr. Lionel  |                1 |       180 |      18000.00 |
+| Sage, Miss. Constanc |                1 |       181 |      18100.00 |
+| Pernot, Mr. Rene     |                1 |       182 |      18200.00 |
+| Asplund, Master. Cla |                1 |       183 |      18300.00 |
+| Becker, Master. Rich |                1 |       184 |      18400.00 |
+| Kink-Heilmann, Miss. |                1 |       185 |      18500.00 |
+| Rood, Mr. Hugh Rosco |                1 |       186 |      18600.00 |
+| O'Brien, Mrs. Thomas |                1 |       187 |      18700.00 |
+| Romaine, Mr. Charles |                1 |       188 |      18800.00 |
+| Bourke, Mr. John     |                1 |       189 |      18900.00 |
+| Turcin, Mr. Stjepan  |                1 |       190 |      19000.00 |
+| Pinsky, Mrs. (Rosa)  |                1 |       191 |      19100.00 |
+| Carbines, Mr. Willia |                1 |       192 |      19200.00 |
+| Andersen-Jensen, Mis |                1 |       193 |      19300.00 |
+| Navratil, Master. Mi |                1 |       194 |      19400.00 |
+| Brown, Mrs. James Jo |                1 |       195 |      19500.00 |
+| Lurette, Miss. Elise |                1 |       196 |      19600.00 |
+| Mernagh, Mr. Robert  |                1 |       197 |      19700.00 |
+| Olsen, Mr. Karl Sieg |                1 |       198 |      19800.00 |
+| Madigan, Miss. Marga |                1 |       199 |      19900.00 |
+| Yrois, Miss. Henriet |                1 |       200 |      20000.00 |
+| Vande Walle, Mr. Nes |                1 |       201 |      20100.00 |
+| Sage, Mr. Frederick  |                1 |       202 |      20200.00 |
+| Johanson, Mr. Jakob  |                1 |       203 |      20300.00 |
+| Youseff, Mr. Gerious |                1 |       204 |      20400.00 |
+| Cohen, Mr. Gurshon " |                1 |       205 |      20500.00 |
+| Strom, Miss. Telma M |                1 |       206 |      20600.00 |
+| Backstrom, Mr. Karl  |                1 |       207 |      20700.00 |
+| Albimona, Mr. Nassef |                1 |       208 |      20800.00 |
+| Carr, Miss. Helen "E |                1 |       209 |      20900.00 |
+| Blank, Mr. Henry     |                1 |       210 |      21000.00 |
+| Ali, Mr. Ahmed       |                1 |       211 |      21100.00 |
+| Cameron, Miss. Clear |                1 |       212 |      21200.00 |
+| Perkin, Mr. John Hen |                1 |       213 |      21300.00 |
+| Givard, Mr. Hans Kri |                1 |       214 |      21400.00 |
+| Kiernan, Mr. Philip  |                1 |       215 |      21500.00 |
+| Newell, Miss. Madele |                1 |       216 |      21600.00 |
+| Honkanen, Miss. Elii |                1 |       217 |      21700.00 |
+| Jacobsohn, Mr. Sidne |                1 |       218 |      21800.00 |
+| Bazzani, Miss. Albin |                1 |       219 |      21900.00 |
+| Harris, Mr. Walter   |                1 |       220 |      22000.00 |
+| Sunderland, Mr. Vict |                1 |       221 |      22100.00 |
+| Bracken, Mr. James H |                1 |       222 |      22200.00 |
+| Green, Mr. George He |                1 |       223 |      22300.00 |
+| Nenkoff, Mr. Christo |                1 |       224 |      22400.00 |
+| Hoyt, Mr. Frederick  |                1 |       225 |      22500.00 |
+| Berglund, Mr. Karl I |                1 |       226 |      22600.00 |
+| Mellors, Mr. William |                1 |       227 |      22700.00 |
+| Lovell, Mr. John Hal |                1 |       228 |      22800.00 |
+| Fahlstrom, Mr. Arne  |                1 |       229 |      22900.00 |
+| Lefebre, Miss. Mathi |                1 |       230 |      23000.00 |
+| Harris, Mrs. Henry B |                1 |       231 |      23100.00 |
+| Larsson, Mr. Bengt E |                1 |       232 |      23200.00 |
+| Sjostedt, Mr. Ernst  |                1 |       233 |      23300.00 |
+| Asplund, Miss. Lilli |                1 |       234 |      23400.00 |
+| Leyson, Mr. Robert W |                1 |       235 |      23500.00 |
+| Harknett, Miss. Alic |                1 |       236 |      23600.00 |
+| Hold, Mr. Stephen    |                1 |       237 |      23700.00 |
+| Collyer, Miss. Marjo |                1 |       238 |      23800.00 |
+| Pengelly, Mr. Freder |                1 |       239 |      23900.00 |
+| Hunt, Mr. George Hen |                1 |       240 |      24000.00 |
+| Zabour, Miss. Thamin |                1 |       241 |      24100.00 |
+| Murphy, Miss. Kather |                1 |       242 |      24200.00 |
+| Coleridge, Mr. Regin |                1 |       243 |      24300.00 |
+| Maenpaa, Mr. Matti A |                1 |       244 |      24400.00 |
+| Attalah, Mr. Sleiman |                1 |       245 |      24500.00 |
+| Minahan, Dr. William |                1 |       246 |      24600.00 |
+| Lindahl, Miss. Agda  |                1 |       247 |      24700.00 |
+| Hamalainen, Mrs. Wil |                1 |       248 |      24800.00 |
+| Beckwith, Mr. Richar |                1 |       249 |      24900.00 |
+| Carter, Rev. Ernest  |                1 |       250 |      25000.00 |
+| Reed, Mr. James Geor |                1 |       251 |      25100.00 |
+| Strom, Mrs. Wilhelm  |                1 |       252 |      25200.00 |
+| Stead, Mr. William T |                1 |       253 |      25300.00 |
+| Lobb, Mr. William Ar |                1 |       254 |      25400.00 |
+| Rosblom, Mrs. Viktor |                1 |       255 |      25500.00 |
+| Touma, Mrs. Darwis ( |                1 |       256 |      25600.00 |
+| Thorne, Mrs. Gertrud |                1 |       257 |      25700.00 |
+| Cherry, Miss. Gladys |                1 |       258 |      25800.00 |
+| Ward, Miss. Anna     |                1 |       259 |      25900.00 |
+| Parrish, Mrs. (Lutie |                1 |       260 |      26000.00 |
+| Smith, Mr. Thomas    |                1 |       261 |      26100.00 |
+| Asplund, Master. Edv |                1 |       262 |      26200.00 |
+| Taussig, Mr. Emil    |                1 |       263 |      26300.00 |
+| Harrison, Mr. Willia |                1 |       264 |      26400.00 |
+| Henry, Miss. Delia   |                1 |       265 |      26500.00 |
+| Reeves, Mr. David    |                1 |       266 |      26600.00 |
+| Panula, Mr. Ernesti  |                1 |       267 |      26700.00 |
+| Persson, Mr. Ernst U |                1 |       268 |      26800.00 |
+| Graham, Mrs. William |                1 |       269 |      26900.00 |
+| Bissette, Miss. Amel |                1 |       270 |      27000.00 |
+| Cairns, Mr. Alexande |                1 |       271 |      27100.00 |
+| Tornquist, Mr. Willi |                1 |       272 |      27200.00 |
+| Mellinger, Mrs. (Eli |                1 |       273 |      27300.00 |
+| Natsch, Mr. Charles  |                1 |       274 |      27400.00 |
+| Healy, Miss. Hanora  |                1 |       275 |      27500.00 |
+| Andrews, Miss. Korne |                1 |       276 |      27600.00 |
+| Lindblom, Miss. Augu |                1 |       277 |      27700.00 |
+| Parkes, Mr. Francis  |                1 |       278 |      27800.00 |
+| Rice, Master. Eric   |                1 |       279 |      27900.00 |
+| Abbott, Mrs. Stanton |                1 |       280 |      28000.00 |
+| Duane, Mr. Frank     |                1 |       281 |      28100.00 |
+| Olsson, Mr. Nils Joh |                1 |       282 |      28200.00 |
+| de Pelsmaeker, Mr. A |                1 |       283 |      28300.00 |
+| Dorking, Mr. Edward  |                1 |       284 |      28400.00 |
+| Smith, Mr. Richard W |                1 |       285 |      28500.00 |
+| Stankovic, Mr. Ivan  |                1 |       286 |      28600.00 |
+| de Mulder, Mr. Theod |                1 |       287 |      28700.00 |
+| Naidenoff, Mr. Penko |                1 |       288 |      28800.00 |
+| Hosono, Mr. Masabumi |                1 |       289 |      28900.00 |
+| Connolly, Miss. Kate |                1 |       290 |      29000.00 |
+| Barber, Miss. Ellen  |                1 |       291 |      29100.00 |
+| Bishop, Mrs. Dickins |                1 |       292 |      29200.00 |
+| Levy, Mr. Rene Jacqu |                1 |       293 |      29300.00 |
+| Haas, Miss. Aloisia  |                1 |       294 |      29400.00 |
+| Mineff, Mr. Ivan     |                1 |       295 |      29500.00 |
+| Lewy, Mr. Ervin G    |                1 |       296 |      29600.00 |
+| Hanna, Mr. Mansour   |                1 |       297 |      29700.00 |
+| Allison, Miss. Helen |                1 |       298 |      29800.00 |
+| Saalfeld, Mr. Adolph |                1 |       299 |      29900.00 |
+| Baxter, Mrs. James ( |                1 |       300 |      30000.00 |
+| Kelly, Miss. Anna Ka |                1 |       301 |      30100.00 |
+| McCoy, Mr. Bernard   |                1 |       302 |      30200.00 |
+| Johnson, Mr. William |                1 |       303 |      30300.00 |
+| Keane, Miss. Nora A  |                1 |       304 |      30400.00 |
+| Williams, Mr. Howard |                1 |       305 |      30500.00 |
+| Allison, Master. Hud |                1 |       306 |      30600.00 |
+| Fleming, Miss. Marga |                1 |       307 |      30700.00 |
+| Penasco y Castellana |                2 |       814 |      40700.00 |
+| Abelson, Mr. Samuel  |                1 |       309 |      30900.00 |
+| Francatelli, Miss. L |                1 |       310 |      31000.00 |
+| Hays, Miss. Margaret |                1 |       311 |      31100.00 |
+| Ryerson, Miss. Emily |                1 |       312 |      31200.00 |
+| Lahtinen, Mrs. Willi |                1 |       313 |      31300.00 |
+| Hendekovic, Mr. Ignj |                1 |       314 |      31400.00 |
+| Hart, Mr. Benjamin   |                1 |       315 |      31500.00 |
+| Nilsson, Miss. Helmi |                1 |       316 |      31600.00 |
+| Kantor, Mrs. Sinai ( |                1 |       317 |      31700.00 |
+| Moraweck, Dr. Ernest |                1 |       318 |      31800.00 |
+| Wick, Miss. Mary Nat |                1 |       319 |      31900.00 |
+| Spedden, Mrs. Freder |                1 |       320 |      32000.00 |
+| Dennis, Mr. Samuel   |                1 |       321 |      32100.00 |
+| Danoff, Mr. Yoto     |                1 |       322 |      32200.00 |
+| Slayter, Miss. Hilda |                1 |       323 |      32300.00 |
+| Caldwell, Mrs. Alber |                1 |       324 |      32400.00 |
+| Sage, Mr. George Joh |                1 |       325 |      32500.00 |
+| Young, Miss. Marie G |                1 |       326 |      32600.00 |
+| Nysveen, Mr. Johan H |                1 |       327 |      32700.00 |
+| Ball, Mrs. (Ada E Ha |                1 |       328 |      32800.00 |
+| Goldsmith, Mrs. Fran |                1 |       329 |      32900.00 |
+| Hippach, Miss. Jean  |                1 |       330 |      33000.00 |
+| McCoy, Miss. Agnes   |                1 |       331 |      33100.00 |
+| Partner, Mr. Austen  |                1 |       332 |      33200.00 |
+| Graham, Mr. George E |                1 |       333 |      33300.00 |
+| Vander Planke, Mr. L |                1 |       334 |      33400.00 |
+| Frauenthal, Mrs. Hen |                1 |       335 |      33500.00 |
+| Denkoff, Mr. Mitto   |                1 |       336 |      33600.00 |
+| Pears, Mr. Thomas Cl |                1 |       337 |      33700.00 |
+| Burns, Miss. Elizabe |                1 |       338 |      33800.00 |
+| Dahl, Mr. Karl Edwar |                1 |       339 |      33900.00 |
+| Blackwell, Mr. Steph |                1 |       340 |      34000.00 |
+| Navratil, Master. Ed |                1 |       341 |      34100.00 |
+| Fortune, Miss. Alice |                1 |       342 |      34200.00 |
+| Collander, Mr. Erik  |                1 |       343 |      34300.00 |
+| Sedgwick, Mr. Charle |                1 |       344 |      34400.00 |
+| Fox, Mr. Stanley Hub |                1 |       345 |      34500.00 |
+| Brown, Miss. Amelia  |                1 |       346 |      34600.00 |
+| Smith, Miss. Marion  |                1 |       347 |      34700.00 |
+| Davison, Mrs. Thomas |                1 |       348 |      34800.00 |
+| Coutts, Master. Will |                1 |       349 |      34900.00 |
+| Dimic, Mr. Jovan     |                1 |       350 |      35000.00 |
+| Odahl, Mr. Nils Mart |                1 |       351 |      35100.00 |
+| Williams-Lambert, Mr |                1 |       352 |      35200.00 |
+| Elias, Mr. Tannous   |                1 |       353 |      35300.00 |
+| Arnold-Franchi, Mr.  |                1 |       354 |      35400.00 |
+| Yousif, Mr. Wazli    |                1 |       355 |      35500.00 |
+| Vanden Steen, Mr. Le |                1 |       356 |      35600.00 |
+| Bowerman, Miss. Elsi |                1 |       357 |      35700.00 |
+| Funk, Miss. Annie Cl |                1 |       358 |      35800.00 |
+| McGovern, Miss. Mary |                1 |       359 |      35900.00 |
+| Mockler, Miss. Helen |                1 |       360 |      36000.00 |
+| Skoog, Mr. Wilhelm   |                1 |       361 |      36100.00 |
+| del Carlo, Mr. Sebas |                1 |       362 |      36200.00 |
+| Barbara, Mrs. (Cathe |                1 |       363 |      36300.00 |
+| Asim, Mr. Adola      |                1 |       364 |      36400.00 |
+| O'Brien, Mr. Thomas  |                1 |       365 |      36500.00 |
+| Adahl, Mr. Mauritz N |                1 |       366 |      36600.00 |
+| Warren, Mrs. Frank M |                1 |       367 |      36700.00 |
+| Moussa, Mrs. (Mantou |                1 |       368 |      36800.00 |
+| Jermyn, Miss. Annie  |                1 |       369 |      36900.00 |
+| Aubart, Mme. Leontin |                1 |       370 |      37000.00 |
+| Harder, Mr. George A |                1 |       371 |      37100.00 |
+| Wiklund, Mr. Jakob A |                1 |       372 |      37200.00 |
+| Beavan, Mr. William  |                1 |       373 |      37300.00 |
+| Ringhini, Mr. Sante  |                1 |       374 |      37400.00 |
+| Palsson, Miss. Stina |                1 |       375 |      37500.00 |
+| Meyer, Mrs. Edgar Jo |                1 |       376 |      37600.00 |
+| Landergren, Miss. Au |                1 |       377 |      37700.00 |
+| Widener, Mr. Harry E |                1 |       378 |      37800.00 |
+| Betros, Mr. Tannous  |                1 |       379 |      37900.00 |
+| Gustafsson, Mr. Karl |                1 |       380 |      38000.00 |
+| Bidois, Miss. Rosali |                1 |       381 |      38100.00 |
+| Nakid, Miss. Maria ( |                1 |       382 |      38200.00 |
+| Tikkanen, Mr. Juho   |                1 |       383 |      38300.00 |
+| Holverson, Mrs. Alex |                1 |       384 |      38400.00 |
+| Plotcharsky, Mr. Vas |                1 |       385 |      38500.00 |
+| Davies, Mr. Charles  |                1 |       386 |      38600.00 |
+| Goodwin, Master. Sid |                1 |       387 |      38700.00 |
+| Buss, Miss. Kate     |                1 |       388 |      38800.00 |
+| Sadlier, Mr. Matthew |                1 |       389 |      38900.00 |
+| Lehmann, Miss. Berth |                1 |       390 |      39000.00 |
+| Carter, Mr. William  |                1 |       391 |      39100.00 |
+| Jansson, Mr. Carl Ol |                1 |       392 |      39200.00 |
+| Gustafsson, Mr. Joha |                1 |       393 |      39300.00 |
+| Newell, Miss. Marjor |                1 |       394 |      39400.00 |
+| Sandstrom, Mrs. Hjal |                1 |       395 |      39500.00 |
+| Johansson, Mr. Erik  |                1 |       396 |      39600.00 |
+| Olsson, Miss. Elina  |                1 |       397 |      39700.00 |
+| McKane, Mr. Peter Da |                1 |       398 |      39800.00 |
+| Pain, Dr. Alfred     |                1 |       399 |      39900.00 |
+| Trout, Mrs. William  |                1 |       400 |      40000.00 |
+| Niskanen, Mr. Juha   |                1 |       401 |      40100.00 |
+| Adams, Mr. John      |                1 |       402 |      40200.00 |
+| Jussila, Miss. Mari  |                1 |       403 |      40300.00 |
+| Hakkarainen, Mr. Pek |                1 |       404 |      40400.00 |
+| Oreskovic, Miss. Mar |                1 |       405 |      40500.00 |
+| Gale, Mr. Shadrach   |                1 |       406 |      40600.00 |
+| Widegren, Mr. Carl/C |                1 |       407 |      40700.00 |
+| Richards, Master. Wi |                1 |       408 |      40800.00 |
+| Birkeland, Mr. Hans  |                1 |       409 |      40900.00 |
+| Lefebre, Miss. Ida   |                1 |       410 |      41000.00 |
+| Sdycoff, Mr. Todor   |                1 |       411 |      41100.00 |
+| Hart, Mr. Henry      |                1 |       412 |      41200.00 |
+| Minahan, Miss. Daisy |                1 |       413 |      41300.00 |
+| Cunningham, Mr. Alfr |                1 |       414 |      41400.00 |
+| Sundman, Mr. Johan J |                1 |       415 |      41500.00 |
+| Meek, Mrs. Thomas (A |                1 |       416 |      41600.00 |
+| Drew, Mrs. James Viv |                1 |       417 |      41700.00 |
+| Silven, Miss. Lyyli  |                1 |       418 |      41800.00 |
+| Matthews, Mr. Willia |                1 |       419 |      41900.00 |
+| Van Impe, Miss. Cath |                1 |       420 |      42000.00 |
+| Gheorgheff, Mr. Stan |                1 |       421 |      42100.00 |
+| Charters, Mr. David  |                1 |       422 |      42200.00 |
+| Zimmerman, Mr. Leo   |                1 |       423 |      42300.00 |
+| Danbom, Mrs. Ernst G |                1 |       424 |      42400.00 |
+| Rosblom, Mr. Viktor  |                1 |       425 |      42500.00 |
+| Wiseman, Mr. Phillip |                1 |       426 |      42600.00 |
+| Clarke, Mrs. Charles |                1 |       427 |      42700.00 |
+| Phillips, Miss. Kate |                1 |       428 |      42800.00 |
+| Flynn, Mr. James     |                1 |       429 |      42900.00 |
+| Pickard, Mr. Berk (B |                1 |       430 |      43000.00 |
+| Bjornstrom-Steffanss |                1 |       431 |      43100.00 |
+| Thorneycroft, Mrs. P |                1 |       432 |      43200.00 |
+| Louch, Mrs. Charles  |                1 |       433 |      43300.00 |
+| Kallio, Mr. Nikolai  |                1 |       434 |      43400.00 |
+| Silvey, Mr. William  |                1 |       435 |      43500.00 |
+| Carter, Miss. Lucile |                1 |       436 |      43600.00 |
+| Ford, Miss. Doolina  |                1 |       437 |      43700.00 |
+| Richards, Mrs. Sidne |                1 |       438 |      43800.00 |
+| Fortune, Mr. Mark    |                1 |       439 |      43900.00 |
+| Kvillner, Mr. Johan  |                1 |       440 |      44000.00 |
+| Hart, Mrs. Benjamin  |                1 |       441 |      44100.00 |
+| Hampe, Mr. Leon      |                1 |       442 |      44200.00 |
+| Petterson, Mr. Johan |                1 |       443 |      44300.00 |
+| Reynaldo, Ms. Encarn |                1 |       444 |      44400.00 |
+| Johannesen-Bratthamm |                1 |       445 |      44500.00 |
+| Dodge, Master. Washi |                1 |       446 |      44600.00 |
+| Mellinger, Miss. Mad |                1 |       447 |      44700.00 |
+| Seward, Mr. Frederic |                1 |       448 |      44800.00 |
+| Baclini, Miss. Marie |                1 |       449 |      44900.00 |
+| Peuchen, Major. Arth |                1 |       450 |      45000.00 |
+| West, Mr. Edwy Arthu |                1 |       451 |      45100.00 |
+| Hagland, Mr. Ingvald |                1 |       452 |      45200.00 |
+| Foreman, Mr. Benjami |                1 |       453 |      45300.00 |
+| Goldenberg, Mr. Samu |                1 |       454 |      45400.00 |
+| Peduzzi, Mr. Joseph  |                1 |       455 |      45500.00 |
+| Jalsevac, Mr. Ivan   |                1 |       456 |      45600.00 |
+| Millet, Mr. Francis  |                1 |       457 |      45700.00 |
+| Kenyon, Mrs. Frederi |                1 |       458 |      45800.00 |
+| Toomey, Miss. Ellen  |                1 |       459 |      45900.00 |
+| O'Connor, Mr. Mauric |                1 |       460 |      46000.00 |
+| Anderson, Mr. Harry  |                1 |       461 |      46100.00 |
+| Morley, Mr. William  |                1 |       462 |      46200.00 |
+| Gee, Mr. Arthur H    |                1 |       463 |      46300.00 |
+| Milling, Mr. Jacob C |                1 |       464 |      46400.00 |
+| Maisner, Mr. Simon   |                1 |       465 |      46500.00 |
+| Goncalves, Mr. Manue |                1 |       466 |      46600.00 |
+| Campbell, Mr. Willia |                1 |       467 |      46700.00 |
+| Smart, Mr. John Mont |                1 |       468 |      46800.00 |
+| Scanlan, Mr. James   |                1 |       469 |      46900.00 |
+| Baclini, Miss. Helen |                1 |       470 |      47000.00 |
+| Keefe, Mr. Arthur    |                1 |       471 |      47100.00 |
+| Cacic, Mr. Luka      |                1 |       472 |      47200.00 |
+| West, Mrs. Edwy Arth |                1 |       473 |      47300.00 |
+| Jerwan, Mrs. Amin S  |                1 |       474 |      47400.00 |
+| Strandberg, Miss. Id |                1 |       475 |      47500.00 |
+| Clifford, Mr. George |                1 |       476 |      47600.00 |
+| Renouf, Mr. Peter He |                1 |       477 |      47700.00 |
+| Braund, Mr. Lewis Ri |                1 |       478 |      47800.00 |
+| Karlsson, Mr. Nils A |                1 |       479 |      47900.00 |
+| Hirvonen, Miss. Hild |                1 |       480 |      48000.00 |
+| Goodwin, Master. Har |                1 |       481 |      48100.00 |
+| Frost, Mr. Anthony W |                1 |       482 |      48200.00 |
+| Rouse, Mr. Richard H |                1 |       483 |      48300.00 |
+| Turkula, Mrs. (Hedwi |                1 |       484 |      48400.00 |
+| Bishop, Mr. Dickinso |                1 |       485 |      48500.00 |
+| Lefebre, Miss. Jeann |                1 |       486 |      48600.00 |
+| Hoyt, Mrs. Frederick |                1 |       487 |      48700.00 |
+| Kent, Mr. Edward Aus |                1 |       488 |      48800.00 |
+| Somerton, Mr. Franci |                1 |       489 |      48900.00 |
+| Coutts, Master. Eden |                1 |       490 |      49000.00 |
+| Hagland, Mr. Konrad  |                1 |       491 |      49100.00 |
+| Windelov, Mr. Einar  |                1 |       492 |      49200.00 |
+| Molson, Mr. Harry Ma |                1 |       493 |      49300.00 |
+| Artagaveytia, Mr. Ra |                1 |       494 |      49400.00 |
+| Stanley, Mr. Edward  |                1 |       495 |      49500.00 |
+| Yousseff, Mr. Geriou |                1 |       496 |      49600.00 |
+| Eustis, Miss. Elizab |                1 |       497 |      49700.00 |
+| Shellard, Mr. Freder |                1 |       498 |      49800.00 |
+| Allison, Mrs. Hudson |                1 |       499 |      49900.00 |
+| Svensson, Mr. Olof   |                1 |       500 |      50000.00 |
+| Calic, Mr. Petar     |                1 |       501 |      50100.00 |
+| Canavan, Miss. Mary  |                1 |       502 |      50200.00 |
+| O'Sullivan, Miss. Br |                1 |       503 |      50300.00 |
+| Laitinen, Miss. Kris |                1 |       504 |      50400.00 |
+| Maioni, Miss. Robert |                1 |       505 |      50500.00 |
+| Quick, Mrs. Frederic |                1 |       507 |      50700.00 |
+| Bradley, Mr. George  |                1 |       508 |      50800.00 |
+| Olsen, Mr. Henry Mar |                1 |       509 |      50900.00 |
+| Lang, Mr. Fang       |                1 |       510 |      51000.00 |
+| Daly, Mr. Eugene Pat |                1 |       511 |      51100.00 |
+| Webber, Mr. James    |                1 |       512 |      51200.00 |
+| McGough, Mr. James R |                1 |       513 |      51300.00 |
+| Rothschild, Mrs. Mar |                1 |       514 |      51400.00 |
+| Coleff, Mr. Satio    |                1 |       515 |      51500.00 |
+| Walker, Mr. William  |                1 |       516 |      51600.00 |
+| Lemore, Mrs. (Amelia |                1 |       517 |      51700.00 |
+| Ryan, Mr. Patrick    |                1 |       518 |      51800.00 |
+| Angle, Mrs. William  |                1 |       519 |      51900.00 |
+| Pavlovic, Mr. Stefo  |                1 |       520 |      52000.00 |
+| Perreault, Miss. Ann |                1 |       521 |      52100.00 |
+| Vovk, Mr. Janko      |                1 |       522 |      52200.00 |
+| Lahoud, Mr. Sarkis   |                1 |       523 |      52300.00 |
+| Hippach, Mrs. Louis  |                1 |       524 |      52400.00 |
+| Kassem, Mr. Fared    |                1 |       525 |      52500.00 |
+| Farrell, Mr. James   |                1 |       526 |      52600.00 |
+| Ridsdale, Miss. Lucy |                1 |       527 |      52700.00 |
+| Farthing, Mr. John   |                1 |       528 |      52800.00 |
+| Salonen, Mr. Johan W |                1 |       529 |      52900.00 |
+| Hocking, Mr. Richard |                1 |       530 |      53000.00 |
+| Quick, Miss. Phyllis |                1 |       531 |      53100.00 |
+| Toufik, Mr. Nakli    |                1 |       532 |      53200.00 |
+| Elias, Mr. Joseph Jr |                1 |       533 |      53300.00 |
+| Peter, Mrs. Catherin |                1 |       534 |      53400.00 |
+| Cacic, Miss. Marija  |                1 |       535 |      53500.00 |
+| Hart, Miss. Eva Miri |                1 |       536 |      53600.00 |
+| Butt, Major. Archiba |                1 |       537 |      53700.00 |
+| LeRoy, Miss. Bertha  |                1 |       538 |      53800.00 |
+| Risien, Mr. Samuel B |                1 |       539 |      53900.00 |
+| Frolicher, Miss. Hed |                1 |       540 |      54000.00 |
+| Crosby, Miss. Harrie |                1 |       541 |      54100.00 |
+| Andersson, Miss. Ing |                1 |       542 |      54200.00 |
+| Andersson, Miss. Sig |                1 |       543 |      54300.00 |
+| Beane, Mr. Edward    |                1 |       544 |      54400.00 |
+| Douglas, Mr. Walter  |                1 |       545 |      54500.00 |
+| Nicholson, Mr. Arthu |                1 |       546 |      54600.00 |
+| Beane, Mrs. Edward ( |                1 |       547 |      54700.00 |
+| Padro y Manent, Mr.  |                1 |       548 |      54800.00 |
+| Goldsmith, Mr. Frank |                1 |       549 |      54900.00 |
+| Davies, Master. John |                1 |       550 |      55000.00 |
+| Thayer, Mr. John Bor |                2 |      1250 |      62500.00 |
+| Sharp, Mr. Percival  |                1 |       552 |      55200.00 |
+| O'Brien, Mr. Timothy |                1 |       553 |      55300.00 |
+| Leeni, Mr. Fahim ("P |                1 |       554 |      55400.00 |
+| Ohman, Miss. Velin   |                1 |       555 |      55500.00 |
+| Wright, Mr. George   |                1 |       556 |      55600.00 |
+| Duff Gordon, Lady. ( |                1 |       557 |      55700.00 |
+| Robbins, Mr. Victor  |                1 |       558 |      55800.00 |
+| Taussig, Mrs. Emil ( |                1 |       559 |      55900.00 |
+| de Messemaeker, Mrs. |                1 |       560 |      56000.00 |
+| Morrow, Mr. Thomas R |                1 |       561 |      56100.00 |
+| Sivic, Mr. Husein    |                1 |       562 |      56200.00 |
+| Norman, Mr. Robert D |                1 |       563 |      56300.00 |
+| Simmons, Mr. John    |                1 |       564 |      56400.00 |
+| Meanwell, Miss. (Mar |                1 |       565 |      56500.00 |
+| Davies, Mr. Alfred J |                1 |       566 |      56600.00 |
+| Stoytcheff, Mr. Ilia |                1 |       567 |      56700.00 |
+| Palsson, Mrs. Nils ( |                1 |       568 |      56800.00 |
+| Doharr, Mr. Tannous  |                1 |       569 |      56900.00 |
+| Jonsson, Mr. Carl    |                1 |       570 |      57000.00 |
+| Harris, Mr. George   |                1 |       571 |      57100.00 |
+| Appleton, Mrs. Edwar |                1 |       572 |      57200.00 |
+| Flynn, Mr. John Irwi |                1 |       573 |      57300.00 |
+| Kelly, Miss. Mary    |                1 |       574 |      57400.00 |
+| Rush, Mr. Alfred Geo |                1 |       575 |      57500.00 |
+| Patchett, Mr. George |                1 |       576 |      57600.00 |
+| Garside, Miss. Ethel |                1 |       577 |      57700.00 |
+| Silvey, Mrs. William |                1 |       578 |      57800.00 |
+| Caram, Mrs. Joseph ( |                1 |       579 |      57900.00 |
+| Jussila, Mr. Eiriik  |                1 |       580 |      58000.00 |
+| Christy, Miss. Julie |                1 |       581 |      58100.00 |
+| Thayer, Mrs. John Bo |                1 |       582 |      58200.00 |
+| Downton, Mr. William |                1 |       583 |      58300.00 |
+| Ross, Mr. John Hugo  |                1 |       584 |      58400.00 |
+| Paulner, Mr. Uscher  |                1 |       585 |      58500.00 |
+| Taussig, Miss. Ruth  |                1 |       586 |      58600.00 |
+| Jarvis, Mr. John Den |                1 |       587 |      58700.00 |
+| Frolicher-Stehli, Mr |                1 |       588 |      58800.00 |
+| Gilinski, Mr. Elieze |                1 |       589 |      58900.00 |
+| Murdlin, Mr. Joseph  |                1 |       590 |      59000.00 |
+| Rintamaki, Mr. Matti |                1 |       591 |      59100.00 |
+| Stephenson, Mrs. Wal |                1 |       592 |      59200.00 |
+| Elsbury, Mr. William |                1 |       593 |      59300.00 |
+| Bourke, Miss. Mary   |                1 |       594 |      59400.00 |
+| Chapman, Mr. John He |                1 |       595 |      59500.00 |
+| Van Impe, Mr. Jean B |                1 |       596 |      59600.00 |
+| Leitch, Miss. Jessie |                1 |       597 |      59700.00 |
+| Johnson, Mr. Alfred  |                1 |       598 |      59800.00 |
+| Boulos, Mr. Hanna    |                1 |       599 |      59900.00 |
+| Duff Gordon, Sir. Co |                1 |       600 |      60000.00 |
+| Jacobsohn, Mrs. Sidn |                1 |       601 |      60100.00 |
+| Slabenoff, Mr. Petco |                1 |       602 |      60200.00 |
+| Harrington, Mr. Char |                1 |       603 |      60300.00 |
+| Torber, Mr. Ernst Wi |                1 |       604 |      60400.00 |
+| Homer, Mr. Harry ("M |                1 |       605 |      60500.00 |
+| Lindell, Mr. Edvard  |                1 |       606 |      60600.00 |
+| Karaic, Mr. Milan    |                1 |       607 |      60700.00 |
+| Daniel, Mr. Robert W |                1 |       608 |      60800.00 |
+| Laroche, Mrs. Joseph |                1 |       609 |      60900.00 |
+| Shutes, Miss. Elizab |                1 |       610 |      61000.00 |
+| Andersson, Mrs. Ande |                1 |       611 |      61100.00 |
+| Jardin, Mr. Jose Net |                1 |       612 |      61200.00 |
+| Murphy, Miss. Margar |                1 |       613 |      61300.00 |
+| Horgan, Mr. John     |                1 |       614 |      61400.00 |
+| Brocklebank, Mr. Wil |                1 |       615 |      61500.00 |
+| Herman, Miss. Alice  |                1 |       616 |      61600.00 |
+| Danbom, Mr. Ernst Gi |                1 |       617 |      61700.00 |
+| Lobb, Mrs. William A |                1 |       618 |      61800.00 |
+| Becker, Miss. Marion |                1 |       619 |      61900.00 |
+| Gavey, Mr. Lawrence  |                1 |       620 |      62000.00 |
+| Yasbeck, Mr. Antoni  |                1 |       621 |      62100.00 |
+| Kimball, Mr. Edwin N |                1 |       622 |      62200.00 |
+| Nakid, Mr. Sahid     |                1 |       623 |      62300.00 |
+| Hansen, Mr. Henry Da |                1 |       624 |      62400.00 |
+| Bowen, Mr. David Joh |                1 |       625 |      62500.00 |
+| Sutton, Mr. Frederic |                1 |       626 |      62600.00 |
+| Kirkland, Rev. Charl |                1 |       627 |      62700.00 |
+| Longley, Miss. Gretc |                1 |       628 |      62800.00 |
+| Bostandyeff, Mr. Gue |                1 |       629 |      62900.00 |
+| O'Connell, Mr. Patri |                1 |       630 |      63000.00 |
+| Barkworth, Mr. Alger |                1 |       631 |      63100.00 |
+| Lundahl, Mr. Johan S |                1 |       632 |      63200.00 |
+| Stahelin-Maeglin, Dr |                1 |       633 |      63300.00 |
+| Parr, Mr. William He |                1 |       634 |      63400.00 |
+| Skoog, Miss. Mabel   |                1 |       635 |      63500.00 |
+| Davis, Miss. Mary    |                1 |       636 |      63600.00 |
+| Leinonen, Mr. Antti  |                1 |       637 |      63700.00 |
+| Collyer, Mr. Harvey  |                1 |       638 |      63800.00 |
+| Panula, Mrs. Juha (M |                1 |       639 |      63900.00 |
+| Thorneycroft, Mr. Pe |                1 |       640 |      64000.00 |
+| Jensen, Mr. Hans Ped |                1 |       641 |      64100.00 |
+| Sagesser, Mlle. Emma |                1 |       642 |      64200.00 |
+| Skoog, Miss. Margit  |                1 |       643 |      64300.00 |
+| Foo, Mr. Choong      |                1 |       644 |      64400.00 |
+| Baclini, Miss. Eugen |                1 |       645 |      64500.00 |
+| Harper, Mr. Henry Sl |                1 |       646 |      64600.00 |
+| Cor, Mr. Liudevit    |                1 |       647 |      64700.00 |
+| Simonius-Blumer, Col |                1 |       648 |      64800.00 |
+| Willey, Mr. Edward   |                1 |       649 |      64900.00 |
+| Stanley, Miss. Amy Z |                1 |       650 |      65000.00 |
+| Mitkoff, Mr. Mito    |                1 |       651 |      65100.00 |
+| Doling, Miss. Elsie  |                1 |       652 |      65200.00 |
+| Kalvik, Mr. Johannes |                1 |       653 |      65300.00 |
+| O'Leary, Miss. Hanor |                1 |       654 |      65400.00 |
+| Hegarty, Miss. Hanor |                1 |       655 |      65500.00 |
+| Hickman, Mr. Leonard |                1 |       656 |      65600.00 |
+| Radeff, Mr. Alexande |                1 |       657 |      65700.00 |
+| Bourke, Mrs. John (C |                1 |       658 |      65800.00 |
+| Eitemiller, Mr. Geor |                1 |       659 |      65900.00 |
+| Newell, Mr. Arthur W |                1 |       660 |      66000.00 |
+| Frauenthal, Dr. Henr |                1 |       661 |      66100.00 |
+| Badt, Mr. Mohamed    |                1 |       662 |      66200.00 |
+| Colley, Mr. Edward P |                1 |       663 |      66300.00 |
+| Coleff, Mr. Peju     |                1 |       664 |      66400.00 |
+| Lindqvist, Mr. Eino  |                1 |       665 |      66500.00 |
+| Hickman, Mr. Lewis   |                1 |       666 |      66600.00 |
+| Butler, Mr. Reginald |                1 |       667 |      66700.00 |
+| Rommetvedt, Mr. Knud |                1 |       668 |      66800.00 |
+| Cook, Mr. Jacob      |                1 |       669 |      66900.00 |
+| Taylor, Mrs. Elmer Z |                1 |       670 |      67000.00 |
+| Brown, Mrs. Thomas W |                1 |       671 |      67100.00 |
+| Davidson, Mr. Thornt |                1 |       672 |      67200.00 |
+| Mitchell, Mr. Henry  |                1 |       673 |      67300.00 |
+| Wilhelms, Mr. Charle |                1 |       674 |      67400.00 |
+| Watson, Mr. Ennis Ha |                1 |       675 |      67500.00 |
+| Edvardsson, Mr. Gust |                1 |       676 |      67600.00 |
+| Sawyer, Mr. Frederic |                1 |       677 |      67700.00 |
+| Turja, Miss. Anna So |                1 |       678 |      67800.00 |
+| Goodwin, Mrs. Freder |                1 |       679 |      67900.00 |
+| Cardeza, Mr. Thomas  |                1 |       680 |      68000.00 |
+| Peters, Miss. Katie  |                1 |       681 |      68100.00 |
+| Hassab, Mr. Hammad   |                1 |       682 |      68200.00 |
+| Olsvigen, Mr. Thor A |                1 |       683 |      68300.00 |
+| Goodwin, Mr. Charles |                1 |       684 |      68400.00 |
+| Brown, Mr. Thomas Wi |                1 |       685 |      68500.00 |
+| Laroche, Mr. Joseph  |                1 |       686 |      68600.00 |
+| Panula, Mr. Jaako Ar |                1 |       687 |      68700.00 |
+| Dakic, Mr. Branko    |                1 |       688 |      68800.00 |
+| Fischer, Mr. Eberhar |                1 |       689 |      68900.00 |
+| Madill, Miss. George |                1 |       690 |      69000.00 |
+| Dick, Mr. Albert Adr |                1 |       691 |      69100.00 |
+| Karun, Miss. Manca   |                1 |       692 |      69200.00 |
+| Lam, Mr. Ali         |                1 |       693 |      69300.00 |
+| Saad, Mr. Khalil     |                1 |       694 |      69400.00 |
+| Weir, Col. John      |                1 |       695 |      69500.00 |
+| Chapman, Mr. Charles |                1 |       696 |      69600.00 |
+| Kelly, Mr. James     |                1 |       697 |      69700.00 |
+| Mullens, Miss. Kathe |                1 |       698 |      69800.00 |
+| Humblen, Mr. Adolf M |                1 |       700 |      70000.00 |
+| Astor, Mrs. John Jac |                1 |       701 |      70100.00 |
+| Silverthorne, Mr. Sp |                1 |       702 |      70200.00 |
+| Barbara, Miss. Saiid |                1 |       703 |      70300.00 |
+| Gallagher, Mr. Marti |                1 |       704 |      70400.00 |
+| Hansen, Mr. Henrik J |                1 |       705 |      70500.00 |
+| Morley, Mr. Henry Sa |                1 |       706 |      70600.00 |
+| Kelly, Mrs. Florence |                1 |       707 |      70700.00 |
+| Calderhead, Mr. Edwa |                1 |       708 |      70800.00 |
+| Cleaver, Miss. Alice |                1 |       709 |      70900.00 |
+| Moubarek, Master. Ha |                1 |       710 |      71000.00 |
+| Mayne, Mlle. Berthe  |                1 |       711 |      71100.00 |
+| Klaber, Mr. Herman   |                1 |       712 |      71200.00 |
+| Taylor, Mr. Elmer Ze |                1 |       713 |      71300.00 |
+| Larsson, Mr. August  |                1 |       714 |      71400.00 |
+| Greenberg, Mr. Samue |                1 |       715 |      71500.00 |
+| Soholt, Mr. Peter An |                1 |       716 |      71600.00 |
+| Endres, Miss. Caroli |                1 |       717 |      71700.00 |
+| Troutt, Miss. Edwina |                1 |       718 |      71800.00 |
+| McEvoy, Mr. Michael  |                1 |       719 |      71900.00 |
+| Johnson, Mr. Malkolm |                1 |       720 |      72000.00 |
+| Harper, Miss. Annie  |                1 |       721 |      72100.00 |
+| Jensen, Mr. Svend La |                1 |       722 |      72200.00 |
+| Gillespie, Mr. Willi |                1 |       723 |      72300.00 |
+| Hodges, Mr. Henry Pr |                1 |       724 |      72400.00 |
+| Chambers, Mr. Norman |                1 |       725 |      72500.00 |
+| Oreskovic, Mr. Luka  |                1 |       726 |      72600.00 |
+| Renouf, Mrs. Peter H |                1 |       727 |      72700.00 |
+| Mannion, Miss. Marga |                1 |       728 |      72800.00 |
+| Bryhl, Mr. Kurt Arno |                1 |       729 |      72900.00 |
+| Ilmakangas, Miss. Pi |                1 |       730 |      73000.00 |
+| Allen, Miss. Elisabe |                1 |       731 |      73100.00 |
+| Hassan, Mr. Houssein |                1 |       732 |      73200.00 |
+| Knight, Mr. Robert J |                1 |       733 |      73300.00 |
+| Berriman, Mr. Willia |                1 |       734 |      73400.00 |
+| Troupiansky, Mr. Mos |                1 |       735 |      73500.00 |
+| Williams, Mr. Leslie |                1 |       736 |      73600.00 |
+| Ford, Mrs. Edward (M |                1 |       737 |      73700.00 |
+| Lesurer, Mr. Gustave |                1 |       738 |      73800.00 |
+| Ivanoff, Mr. Kanio   |                1 |       739 |      73900.00 |
+| Nankoff, Mr. Minko   |                1 |       740 |      74000.00 |
+| Hawksford, Mr. Walte |                1 |       741 |      74100.00 |
+| Cavendish, Mr. Tyrel |                1 |       742 |      74200.00 |
+| Ryerson, Miss. Susan |                1 |       743 |      74300.00 |
+| McNamee, Mr. Neal    |                1 |       744 |      74400.00 |
+| Stranden, Mr. Juho   |                1 |       745 |      74500.00 |
+| Crosby, Capt. Edward |                1 |       746 |      74600.00 |
+| Abbott, Mr. Rossmore |                1 |       747 |      74700.00 |
+| Sinkkonen, Miss. Ann |                1 |       748 |      74800.00 |
+| Marvin, Mr. Daniel W |                1 |       749 |      74900.00 |
+| Connaghton, Mr. Mich |                1 |       750 |      75000.00 |
+| Wells, Miss. Joan    |                1 |       751 |      75100.00 |
+| Moor, Master. Meier  |                1 |       752 |      75200.00 |
+| Vande Velde, Mr. Joh |                1 |       753 |      75300.00 |
+| Jonkoff, Mr. Lalio   |                1 |       754 |      75400.00 |
+| Herman, Mrs. Samuel  |                1 |       755 |      75500.00 |
+| Hamalainen, Master.  |                1 |       756 |      75600.00 |
+| Carlsson, Mr. August |                1 |       757 |      75700.00 |
+| Bailey, Mr. Percy An |                1 |       758 |      75800.00 |
+| Theobald, Mr. Thomas |                1 |       759 |      75900.00 |
+| Rothes, the Countess |                1 |       760 |      76000.00 |
+| Garfirth, Mr. John   |                1 |       761 |      76100.00 |
+| Nirva, Mr. Iisakki A |                1 |       762 |      76200.00 |
+| Barah, Mr. Hanna Ass |                1 |       763 |      76300.00 |
+| Carter, Mrs. William |                1 |       764 |      76400.00 |
+| Eklund, Mr. Hans Lin |                1 |       765 |      76500.00 |
+| Hogeboom, Mrs. John  |                1 |       766 |      76600.00 |
+| Brewe, Dr. Arthur Ja |                1 |       767 |      76700.00 |
+| Mangan, Miss. Mary   |                1 |       768 |      76800.00 |
+| Moran, Mr. Daniel J  |                1 |       769 |      76900.00 |
+| Gronnestad, Mr. Dani |                1 |       770 |      77000.00 |
+| Lievens, Mr. Rene Ai |                1 |       771 |      77100.00 |
+| Jensen, Mr. Niels Pe |                1 |       772 |      77200.00 |
+| Mack, Mrs. (Mary)    |                1 |       773 |      77300.00 |
+| Elias, Mr. Dibo      |                1 |       774 |      77400.00 |
+| Hocking, Mrs. Elizab |                1 |       775 |      77500.00 |
+| Myhrman, Mr. Pehr Fa |                1 |       776 |      77600.00 |
+| Tobin, Mr. Roger     |                1 |       777 |      77700.00 |
+| Emanuel, Miss. Virgi |                1 |       778 |      77800.00 |
+| Kilgannon, Mr. Thoma |                1 |       779 |      77900.00 |
+| Robert, Mrs. Edward  |                1 |       780 |      78000.00 |
+| Ayoub, Miss. Banoura |                1 |       781 |      78100.00 |
+| Dick, Mrs. Albert Ad |                1 |       782 |      78200.00 |
+| Long, Mr. Milton Cly |                1 |       783 |      78300.00 |
+| Johnston, Mr. Andrew |                1 |       784 |      78400.00 |
+| Ali, Mr. William     |                1 |       785 |      78500.00 |
+| Harmer, Mr. Abraham  |                1 |       786 |      78600.00 |
+| Sjoblom, Miss. Anna  |                1 |       787 |      78700.00 |
+| Rice, Master. George |                1 |       788 |      78800.00 |
+| Dean, Master. Bertra |                1 |       789 |      78900.00 |
+| Guggenheim, Mr. Benj |                1 |       790 |      79000.00 |
+| Keane, Mr. Andrew "A |                1 |       791 |      79100.00 |
+| Gaskell, Mr. Alfred  |                1 |       792 |      79200.00 |
+| Sage, Miss. Stella A |                1 |       793 |      79300.00 |
+| Hoyt, Mr. William Fi |                1 |       794 |      79400.00 |
+| Dantcheff, Mr. Risti |                1 |       795 |      79500.00 |
+| Otter, Mr. Richard   |                1 |       796 |      79600.00 |
+| Leader, Dr. Alice (F |                1 |       797 |      79700.00 |
+| Osman, Mrs. Mara     |                1 |       798 |      79800.00 |
+| Ibrahim Shawah, Mr.  |                1 |       799 |      79900.00 |
+| Van Impe, Mrs. Jean  |                1 |       800 |      80000.00 |
+| Ponesell, Mr. Martin |                1 |       801 |      80100.00 |
+| Collyer, Mrs. Harvey |                1 |       802 |      80200.00 |
+| Carter, Master. Will |                1 |       803 |      80300.00 |
+| Thomas, Master. Assa |                1 |       804 |      80400.00 |
+| Hedman, Mr. Oskar Ar |                1 |       805 |      80500.00 |
+| Johansson, Mr. Karl  |                1 |       806 |      80600.00 |
+| Andrews, Mr. Thomas  |                1 |       807 |      80700.00 |
+| Pettersson, Miss. El |                1 |       808 |      80800.00 |
+| Meyer, Mr. August    |                1 |       809 |      80900.00 |
+| Chambers, Mrs. Norma |                1 |       810 |      81000.00 |
+| Alexander, Mr. Willi |                1 |       811 |      81100.00 |
+| Lester, Mr. James    |                1 |       812 |      81200.00 |
+| Slemen, Mr. Richard  |                1 |       813 |      81300.00 |
+| Andersson, Miss. Ebb |                1 |       814 |      81400.00 |
+| Tomlin, Mr. Ernest P |                1 |       815 |      81500.00 |
+| Fry, Mr. Richard     |                1 |       816 |      81600.00 |
+| Heininen, Miss. Wend |                1 |       817 |      81700.00 |
+| Mallet, Mr. Albert   |                1 |       818 |      81800.00 |
+| Holm, Mr. John Fredr |                1 |       819 |      81900.00 |
+| Skoog, Master. Karl  |                1 |       820 |      82000.00 |
+| Hays, Mrs. Charles M |                1 |       821 |      82100.00 |
+| Lulic, Mr. Nikola    |                1 |       822 |      82200.00 |
+| Reuchlin, Jonkheer.  |                1 |       823 |      82300.00 |
+| Moor, Mrs. (Beila)   |                1 |       824 |      82400.00 |
+| Panula, Master. Urho |                1 |       825 |      82500.00 |
+| Flynn, Mr. John      |                1 |       826 |      82600.00 |
+| Lam, Mr. Len         |                1 |       827 |      82700.00 |
+| Mallet, Master. Andr |                1 |       828 |      82800.00 |
+| McCormack, Mr. Thoma |                1 |       829 |      82900.00 |
+| Stone, Mrs. George N |                1 |       830 |      83000.00 |
+| Yasbeck, Mrs. Antoni |                1 |       831 |      83100.00 |
+| Richards, Master. Ge |                1 |       832 |      83200.00 |
+| Saad, Mr. Amin       |                1 |       833 |      83300.00 |
+| Augustsson, Mr. Albe |                1 |       834 |      83400.00 |
+| Allum, Mr. Owen Geor |                1 |       835 |      83500.00 |
+| Compton, Miss. Sara  |                1 |       836 |      83600.00 |
+| Pasic, Mr. Jakob     |                1 |       837 |      83700.00 |
+| Sirota, Mr. Maurice  |                1 |       838 |      83800.00 |
+| Chip, Mr. Chang      |                1 |       839 |      83900.00 |
+| Marechal, Mr. Pierre |                1 |       840 |      84000.00 |
+| Alhomaki, Mr. Ilmari |                1 |       841 |      84100.00 |
+| Mudd, Mr. Thomas Cha |                1 |       842 |      84200.00 |
+| Serepeca, Miss. Augu |                1 |       843 |      84300.00 |
+| Lemberopolous, Mr. P |                1 |       844 |      84400.00 |
+| Culumovic, Mr. Jeso  |                1 |       845 |      84500.00 |
+| Abbing, Mr. Anthony  |                1 |       846 |      84600.00 |
+| Sage, Mr. Douglas Bu |                1 |       847 |      84700.00 |
+| Markoff, Mr. Marin   |                1 |       848 |      84800.00 |
+| Harper, Rev. John    |                1 |       849 |      84900.00 |
+| Goldenberg, Mrs. Sam |                1 |       850 |      85000.00 |
+| Andersson, Master. S |                1 |       851 |      85100.00 |
+| Svensson, Mr. Johan  |                1 |       852 |      85200.00 |
+| Boulos, Miss. Nourel |                1 |       853 |      85300.00 |
+| Lines, Miss. Mary Co |                1 |       854 |      85400.00 |
+| Carter, Mrs. Ernest  |                1 |       855 |      85500.00 |
+| Aks, Mrs. Sam (Leah  |                1 |       856 |      85600.00 |
+| Wick, Mrs. George De |                1 |       857 |      85700.00 |
+| Daly, Mr. Peter Deni |                1 |       858 |      85800.00 |
+| Baclini, Mrs. Solomo |                1 |       859 |      85900.00 |
+| Razi, Mr. Raihed     |                1 |       860 |      86000.00 |
+| Hansen, Mr. Claus Pe |                1 |       861 |      86100.00 |
+| Giles, Mr. Frederick |                1 |       862 |      86200.00 |
+| Swift, Mrs. Frederic |                1 |       863 |      86300.00 |
+| Sage, Miss. Dorothy  |                1 |       864 |      86400.00 |
+| Gill, Mr. John Willi |                1 |       865 |      86500.00 |
+| Bystrom, Mrs. (Karol |                1 |       866 |      86600.00 |
+| Duran y More, Miss.  |                1 |       867 |      86700.00 |
+| Roebling, Mr. Washin |                1 |       868 |      86800.00 |
+| van Melkebeke, Mr. P |                1 |       869 |      86900.00 |
+| Johnson, Master. Har |                1 |       870 |      87000.00 |
+| Balkic, Mr. Cerin    |                1 |       871 |      87100.00 |
+| Beckwith, Mrs. Richa |                1 |       872 |      87200.00 |
+| Carlsson, Mr. Frans  |                1 |       873 |      87300.00 |
+| Vander Cruyssen, Mr. |                1 |       874 |      87400.00 |
+| Abelson, Mrs. Samuel |                1 |       875 |      87500.00 |
+| Najib, Miss. Adele K |                1 |       876 |      87600.00 |
+| Gustafsson, Mr. Alfr |                1 |       877 |      87700.00 |
+| Petroff, Mr. Nedelio |                1 |       878 |      87800.00 |
+| Laleff, Mr. Kristo   |                1 |       879 |      87900.00 |
+| Potter, Mrs. Thomas  |                1 |       880 |      88000.00 |
+| Shelley, Mrs. Willia |                1 |       881 |      88100.00 |
+| Markun, Mr. Johann   |                1 |       882 |      88200.00 |
+| Dahlberg, Miss. Gerd |                1 |       883 |      88300.00 |
+| Banfield, Mr. Freder |                1 |       884 |      88400.00 |
+| Sutehall, Mr. Henry  |                1 |       885 |      88500.00 |
+| Rice, Mrs. William ( |                1 |       886 |      88600.00 |
+| Montvila, Rev. Juoza |                1 |       887 |      88700.00 |
+| Graham, Miss. Margar |                1 |       888 |      88800.00 |
+| Johnston, Miss. Cath |                1 |       889 |      88900.00 |
+| Behr, Mr. Karl Howel |                1 |       890 |      89000.00 |
+| Dooley, Mr. Patrick  |                1 |       891 |      89100.00 |
++----------------------+------------------+-----------+---------------+
+888 rows in set (0.01 sec)
+
+mysql> SELECT
+    ->     j.Pclass,
+    ->     ROUND(AVG(p.Age), 2) AS average_age
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> GROUP BY j.Pclass
+    -> ORDER BY j.Pclass;
++--------+-------------+
+| Pclass | average_age |
++--------+-------------+
+|      0 |        0.00 |
+|      1 |        0.00 |
++--------+-------------+
+2 rows in set (0.01 sec)
+
+mysql> SELECT
+    ->     j.Pclass,
+    ->     ROUND(AVG(j.Fare), 2) AS average_fare
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> GROUP BY j.Pclass
+    -> ORDER BY j.Pclass;
++--------+--------------+
+| Pclass | average_fare |
++--------+--------------+
+|      0 |    180855.74 |
+|      1 |    114503.54 |
++--------+--------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     p.PassengerId,
+    ->     p.Name,
+    ->     p.Sex,
+    ->     j.Pclass,
+    ->     j.Survived,
+    ->     j.Fare
+    -> FROM passengers p
+    -> LEFT JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> LIMIT 10;
++-------------+------+----------------------+--------+----------+-------------+
+| PassengerId | Name | Sex                  | Pclass | Survived | Fare        |
++-------------+------+----------------------+--------+----------+-------------+
+|           0 | 3    | Braund, Mr. Owen Har |      0 |        1 |      0.0000 |
+|           1 | 1    | Cumings, Mrs. John B |      1 |        2 |      0.0000 |
+|           2 | 3    | Heikkinen, Miss. Lai |      1 |        3 |      0.0000 |
+|           3 | 1    | Futrelle, Mrs. Jacqu |      1 |        4 | 113803.0000 |
+|           4 | 3    | Allen, Mr. William H |      0 |        5 | 373450.0000 |
+|           5 | 3    | Moran, Mr. James     |      0 |        6 | 330877.0000 |
+|           6 | 1    | McCarthy, Mr. Timoth |      0 |        7 |  17463.0000 |
+|           7 | 3    | Palsson, Master. Gos |      0 |        8 | 349909.0000 |
+|           8 | 3    | Johnson, Mrs. Oscar  |      1 |        9 | 347742.0000 |
+|           9 | 2    | Nasser, Mrs. Nichola |      1 |       10 | 237736.0000 |
++-------------+------+----------------------+--------+----------+-------------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     PassengerId,
+    ->     Pclass,
+    ->     Fare
+    -> FROM journey_details
+    -> WHERE Fare > (
+    ->     SELECT AVG(Fare)
+    ->     FROM journey_details
+    -> )
+    -> ORDER BY Fare DESC;
++-------------+--------+-------------+
+| PassengerId | Pclass | Fare        |
++-------------+--------+-------------+
+|          50 |      0 | 999999.9999 |
+|          68 |      1 | 999999.9999 |
+|          85 |      1 | 999999.9999 |
+|         104 |      0 | 999999.9999 |
+|         164 |      0 | 999999.9999 |
+|         202 |      0 | 999999.9999 |
+|         206 |      0 | 999999.9999 |
+|         266 |      0 | 999999.9999 |
+|         371 |      0 | 999999.9999 |
+|         392 |      0 | 999999.9999 |
+|         479 |      1 | 999999.9999 |
+|         528 |      0 | 999999.9999 |
+|         638 |      0 | 999999.9999 |
+|         686 |      0 | 999999.9999 |
+|         786 |      1 | 999999.9999 |
+|         824 |      0 | 999999.9999 |
+|         411 |      0 | 394140.0000 |
+|         751 |      1 | 392096.0000 |
+|         823 |      1 | 392096.0000 |
+|         837 |      0 | 392092.0000 |
+|         855 |      1 | 392091.0000 |
+|         347 |      1 | 386525.0000 |
+|         260 |      0 | 384461.0000 |
+|         776 |      0 | 383121.0000 |
+|          16 |      0 | 382652.0000 |
+|         171 |      0 | 382652.0000 |
+|         278 |      0 | 382652.0000 |
+|         787 |      0 | 382652.0000 |
+|         885 |      0 | 382652.0000 |
+|         510 |      1 | 382651.0000 |
+|         264 |      0 | 382649.0000 |
+|         743 |      0 | 376566.0000 |
+|         431 |      1 | 376564.0000 |
+|         639 |      0 | 376564.0000 |
+|          95 |      0 | 374910.0000 |
+|         785 |      0 | 374887.0000 |
+|          77 |      0 | 374746.0000 |
+|           4 |      0 | 373450.0000 |
+|         560 |      0 | 372622.0000 |
+|         160 |      0 | 371362.0000 |
+|         109 |      1 | 371110.0000 |
+|         517 |      0 | 371110.0000 |
+|         768 |      0 | 371110.0000 |
+|         459 |      0 | 371060.0000 |
+|         613 |      0 | 370377.0000 |
+|         890 |      0 | 370376.0000 |
+|         274 |      1 | 370375.0000 |
+|         289 |      1 | 370373.0000 |
+|         126 |      0 | 370372.0000 |
+|          46 |      0 | 370371.0000 |
+|         198 |      1 | 370370.0000 |
+|         116 |      0 | 370369.0000 |
+|         186 |      1 | 370365.0000 |
+|         364 |      0 | 370365.0000 |
+|         254 |      0 | 370129.0000 |
+|         424 |      0 | 370129.0000 |
+|         196 |      0 | 368703.0000 |
+|         825 |      0 | 368323.0000 |
+|         388 |      0 | 367655.0000 |
+|         525 |      0 | 367232.0000 |
+|         208 |      1 | 367231.0000 |
+|         241 |      1 | 367230.0000 |
+|         612 |      1 | 367230.0000 |
+|         214 |      0 | 367229.0000 |
+|         828 |      1 | 367228.0000 |
+|         301 |      1 | 367226.0000 |
+|         330 |      1 | 367226.0000 |
+|         654 |      0 | 365226.0000 |
+|         143 |      0 | 365222.0000 |
+|         428 |      0 | 364851.0000 |
+|         767 |      0 | 364850.0000 |
+|         188 |      0 | 364849.0000 |
+|         657 |      0 | 364849.0000 |
+|         593 |      0 | 364848.0000 |
+|         501 |      0 | 364846.0000 |
+|          79 |      1 | 364516.0000 |
+|         777 |      1 | 364516.0000 |
+|         614 |      0 | 364512.0000 |
+|         603 |      0 | 364511.0000 |
+|         461 |      0 | 364506.0000 |
+|          94 |      0 | 364500.0000 |
+|         814 |      0 | 364499.0000 |
+|         538 |      0 | 364498.0000 |
+|         696 |      0 | 363592.0000 |
+|         758 |      0 | 363294.0000 |
+|         165 |      1 | 363291.0000 |
+|         328 |      1 | 363291.0000 |
+|         548 |      0 | 363291.0000 |
+|         250 |      0 | 362316.0000 |
+|         575 |      0 | 358585.0000 |
+|         760 |      0 | 358585.0000 |
+|         569 |      1 | 350417.0000 |
+|         396 |      0 | 350407.0000 |
+|          14 |      0 | 350406.0000 |
+|         175 |      0 | 350404.0000 |
+|         478 |      0 | 350060.0000 |
+|         395 |      0 | 350052.0000 |
+|         640 |      0 | 350050.0000 |
+|         721 |      0 | 350048.0000 |
+|         771 |      0 | 350047.0000 |
+|         192 |      1 | 350046.0000 |
+|         146 |      1 | 350043.0000 |
+|         756 |      0 | 350042.0000 |
+|         688 |      0 | 350036.0000 |
+|         499 |      0 | 350035.0000 |
+|         391 |      1 | 350034.0000 |
+|         623 |      0 | 350029.0000 |
+|         860 |      0 | 350026.0000 |
+|         704 |      0 | 350025.0000 |
+|         675 |      0 | 349912.0000 |
+|         605 |      0 | 349910.0000 |
+|           7 |      0 | 349909.0000 |
+|          24 |      0 | 349909.0000 |
+|         374 |      0 | 349909.0000 |
+|         567 |      0 | 349909.0000 |
+|         881 |      0 | 349257.0000 |
+|         691 |      1 | 349256.0000 |
+|         420 |      0 | 349254.0000 |
+|          42 |      0 | 349253.0000 |
+|         521 |      0 | 349252.0000 |
+|         561 |      0 | 349251.0000 |
+|         108 |      0 | 349249.0000 |
+|         870 |      0 | 349248.0000 |
+|         189 |      0 | 349247.0000 |
+|         606 |      0 | 349246.0000 |
+|         100 |      0 | 349245.0000 |
+|         797 |      1 | 349244.0000 |
+|         313 |      0 | 349243.0000 |
+|         519 |      0 | 349242.0000 |
+|         130 |      0 | 349241.0000 |
+|         455 |      1 | 349240.0000 |
+|         285 |      0 | 349239.0000 |
+|          49 |      0 | 349237.0000 |
+|         353 |      0 | 349237.0000 |
+|         293 |      0 | 349236.0000 |
+|         223 |      0 | 349234.0000 |
+|         294 |      0 | 349233.0000 |
+|         646 |      0 | 349231.0000 |
+|         687 |      0 | 349228.0000 |
+|         384 |      0 | 349227.0000 |
+|         335 |      0 | 349225.0000 |
+|         628 |      0 | 349224.0000 |
+|         656 |      0 | 349223.0000 |
+|         410 |      0 | 349222.0000 |
+|         650 |      0 | 349221.0000 |
+|         321 |      0 | 349219.0000 |
+|         739 |      0 | 349218.0000 |
+|         878 |      0 | 349217.0000 |
+|          29 |      0 | 349216.0000 |
+|         101 |      0 | 349215.0000 |
+|         601 |      0 | 349214.0000 |
+|         847 |      0 | 349213.0000 |
+|         877 |      0 | 349212.0000 |
+|         663 |      0 | 349210.0000 |
+|         514 |      0 | 349209.0000 |
+|          76 |      0 | 349208.0000 |
+|         105 |      0 | 349207.0000 |
+|         287 |      0 | 349206.0000 |
+|         566 |      0 | 349205.0000 |
+|         753 |      0 | 349204.0000 |
+|         794 |      0 | 349203.0000 |
+|         738 |      0 | 349201.0000 |
+|         715 |      0 | 348124.0000 |
+|          75 |      0 | 348123.0000 |
+|         699 |      0 | 348121.0000 |
+|         631 |      0 | 347743.0000 |
+|           8 |      1 | 347742.0000 |
+|         172 |      1 | 347742.0000 |
+|         869 |      1 | 347742.0000 |
+|         315 |      1 | 347470.0000 |
+|         833 |      0 | 347468.0000 |
+|          91 |      0 | 347466.0000 |
+|         281 |      0 | 347464.0000 |
+|         804 |      1 | 347089.0000 |
+|          63 |      0 | 347088.0000 |
+|         167 |      0 | 347088.0000 |
+|         360 |      0 | 347088.0000 |
+|         634 |      0 | 347088.0000 |
+|         642 |      0 | 347088.0000 |
+|         819 |      0 | 347088.0000 |
+|         807 |      0 | 347087.0000 |
+|         554 |      1 | 347085.0000 |
+|         267 |      1 | 347083.0000 |
+|          13 |      0 | 347082.0000 |
+|         119 |      0 | 347082.0000 |
+|         541 |      0 | 347082.0000 |
+|         542 |      0 | 347082.0000 |
+|         610 |      0 | 347082.0000 |
+|         813 |      0 | 347082.0000 |
+|         850 |      0 | 347082.0000 |
+|         141 |      1 | 347081.0000 |
+|         423 |      0 | 347080.0000 |
+|         616 |      0 | 347080.0000 |
+|         775 |      0 | 347078.0000 |
+|          25 |      1 | 347077.0000 |
+|         182 |      0 | 347077.0000 |
+|         233 |      1 | 347077.0000 |
+|         261 |      1 | 347077.0000 |
+|         442 |      0 | 347076.0000 |
+|         764 |      0 | 347074.0000 |
+|         276 |      0 | 347073.0000 |
+|         246 |      0 | 347071.0000 |
+|         379 |      0 | 347069.0000 |
+|         162 |      0 | 347068.0000 |
+|         231 |      0 | 347067.0000 |
+|         406 |      0 | 347064.0000 |
+|         805 |      0 | 347063.0000 |
+|         719 |      0 | 347062.0000 |
+|         129 |      0 | 347061.0000 |
+|         851 |      0 | 347060.0000 |
+|         205 |      0 | 347054.0000 |
+|         251 |      0 | 347054.0000 |
+|         355 |      0 | 345783.0000 |
+|         770 |      0 | 345781.0000 |
+|         752 |      0 | 345780.0000 |
+|          81 |      1 | 345779.0000 |
+|         282 |      0 | 345778.0000 |
+|         868 |      0 | 345777.0000 |
+|         286 |      1 | 345774.0000 |
+|         419 |      0 | 345773.0000 |
+|         595 |      0 | 345773.0000 |
+|         799 |      0 | 345773.0000 |
+|         200 |      0 | 345770.0000 |
+|         441 |      0 | 345769.0000 |
+|          80 |      0 | 345767.0000 |
+|         873 |      0 | 345765.0000 |
+|          38 |      0 | 345764.0000 |
+|         333 |      0 | 345764.0000 |
+|          18 |      0 | 345763.0000 |
+|         559 |      1 | 345572.0000 |
+|         326 |      0 | 345364.0000 |
+|          90 |      0 | 343276.0000 |
+|          89 |      0 | 343275.0000 |
+|         106 |      1 | 343120.0000 |
+|         415 |      0 | 343095.0000 |
+|         676 |      0 | 342826.0000 |
+|         401 |      0 | 341826.0000 |
+|         280 |      0 | 336439.0000 |
+|          32 |      1 | 335677.0000 |
+|         749 |      0 | 335097.0000 |
+|         629 |      0 | 334912.0000 |
+|         359 |      1 | 330980.0000 |
+|         552 |      0 | 330979.0000 |
+|          28 |      1 | 330959.0000 |
+|          44 |      1 | 330958.0000 |
+|         680 |      0 | 330935.0000 |
+|          82 |      1 | 330932.0000 |
+|         358 |      1 | 330931.0000 |
+|          22 |      1 | 330923.0000 |
+|         653 |      1 | 330919.0000 |
+|         502 |      0 | 330909.0000 |
+|           5 |      0 | 330877.0000 |
+|         112 |      0 | 324669.0000 |
+|         372 |      0 | 323951.0000 |
+|         470 |      0 | 323592.0000 |
+|         184 |      1 | 315153.0000 |
+|          69 |      0 | 315151.0000 |
+|         821 |      1 | 315098.0000 |
+|         836 |      0 | 315097.0000 |
+|         404 |      0 | 315096.0000 |
+|         725 |      0 | 315094.0000 |
+|         163 |      0 | 315093.0000 |
+|         844 |      0 | 315090.0000 |
+|         471 |      0 | 315089.0000 |
+|         349 |      0 | 315088.0000 |
+|         500 |      0 | 315086.0000 |
+|         534 |      0 | 315084.0000 |
+|         422 |      0 | 315082.0000 |
+|         158 |      0 | 315037.0000 |
+|         667 |      0 | 312993.0000 |
+|         408 |      0 | 312992.0000 |
+|         107 |      1 | 312991.0000 |
+|         427 |      1 | 250655.0000 |
+|         705 |      0 | 250655.0000 |
+|         178 |      0 | 250653.0000 |
+|         417 |      1 | 250652.0000 |
+|         312 |      0 | 250651.0000 |
+|         247 |      1 | 250649.0000 |
+|         755 |      1 | 250649.0000 |
+|         747 |      1 | 250648.0000 |
+|         714 |      0 | 250647.0000 |
+|         800 |      0 | 250647.0000 |
+|         213 |      0 | 250646.0000 |
+|         272 |      1 | 250644.0000 |
+|         446 |      1 | 250644.0000 |
+|         723 |      0 | 250643.0000 |
+|         199 |      0 | 248747.0000 |
+|         342 |      0 | 248740.0000 |
+|          78 |      1 | 248738.0000 |
+|         323 |      1 | 248738.0000 |
+|         345 |      1 | 248733.0000 |
+|         695 |      0 | 248731.0000 |
+|         596 |      1 | 248727.0000 |
+|         720 |      1 | 248727.0000 |
+|         848 |      0 | 248727.0000 |
+|         808 |      0 | 248723.0000 |
+|          15 |      1 | 248706.0000 |
+|          21 |      1 | 248698.0000 |
+|          17 |      1 | 244373.0000 |
+|          99 |      0 | 244367.0000 |
+|         316 |      1 | 244367.0000 |
+|         343 |      0 | 244361.0000 |
+|         551 |      0 | 244358.0000 |
+|         149 |      0 | 244310.0000 |
+|         398 |      0 | 244278.0000 |
+|         673 |      1 | 244270.0000 |
+|         249 |      0 | 244252.0000 |
+|         854 |      0 | 244252.0000 |
+|         576 |      1 | 243880.0000 |
+|         217 |      0 | 243847.0000 |
+|         600 |      1 | 243847.0000 |
+|         399 |      1 | 240929.0000 |
+|          20 |      0 | 239865.0000 |
+|         791 |      0 | 239865.0000 |
+|         674 |      0 | 239856.0000 |
+|         732 |      0 | 239855.0000 |
+|         481 |      0 | 239854.0000 |
+|         277 |      0 | 239853.0000 |
+|         413 |      0 | 239853.0000 |
+|         466 |      0 | 239853.0000 |
+|         288 |      1 | 237798.0000 |
+|         580 |      1 | 237789.0000 |
+|           9 |      1 | 237736.0000 |
+|         122 |      0 | 237736.0000 |
+|         357 |      0 | 237671.0000 |
+|         635 |      1 | 237668.0000 |
+|         586 |      0 | 237565.0000 |
+|         232 |      0 | 237442.0000 |
+|         728 |      0 | 236853.0000 |
+|         865 |      1 | 236852.0000 |
+|         228 |      0 | 236171.0000 |
+|         322 |      1 | 234818.0000 |
+|         666 |      0 | 234686.0000 |
+|         190 |      1 | 234604.0000 |
+|         463 |      0 | 234360.0000 |
+|         864 |      0 | 233866.0000 |
+|         734 |      0 | 233639.0000 |
+|         144 |      0 | 231945.0000 |
+|          98 |      1 | 231919.0000 |
+|         651 |      1 | 231919.0000 |
+|         443 |      1 | 230434.0000 |
+|         259 |      1 | 230433.0000 |
+|         880 |      1 | 230433.0000 |
+|         183 |      1 | 230136.0000 |
+|         618 |      1 | 230136.0000 |
+|         148 |      0 | 230080.0000 |
+|         193 |      1 | 230080.0000 |
+|         340 |      1 | 230080.0000 |
+|         344 |      0 | 229236.0000 |
+|         133 |      1 | 228414.0000 |
+|         518 |      1 | 226875.0000 |
+|         303 |      1 | 226593.0000 |
+|         706 |      1 | 223596.0000 |
+|         615 |      1 | 220845.0000 |
+|         754 |      1 | 220845.0000 |
+|         221 |      0 | 220367.0000 |
+|         626 |      0 | 219533.0000 |
+|         562 |      0 | 218629.0000 |
+|         886 |      0 | 211536.0000 |
++-------------+--------+-------------+
+359 rows in set (0.01 sec)
+
+mysql> SELECT
+    ->     p.PassengerId,
+    ->     p.Name,
+    ->     p.Sex,
+    ->     j.Pclass,
+    ->     j.Fare,
+    ->     j.Survived
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> WHERE j.Fare > (
+    ->     SELECT AVG(Fare)
+    ->     FROM journey_details
+    -> )
+    -> AND j.Survived = 1
+    -> ORDER BY j.Fare DESC;
+Empty set (0.00 sec)
+
+mysql> SELECT
+    ->     j.Pclass,
+    ->     COUNT(*) AS total_passengers
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> GROUP BY j.Pclass
+    -> HAVING COUNT(*) > 100
+    -> ORDER BY total_passengers DESC;
++--------+------------------+
+| Pclass | total_passengers |
++--------+------------------+
+|      0 |              549 |
+|      1 |              342 |
++--------+------------------+
+2 rows in set (0.01 sec)
+
+mysql> SELECT ROUND(AVG(Fare), 2) AS average_fare
+    -> FROM journey_details;
++--------------+
+| average_fare |
++--------------+
+|    155387.22 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT
+    ->     PassengerId,
+    ->     Survived,
+    ->     Fare
+    -> FROM journey_details
+    -> WHERE Survived = 1
+    ->   AND Fare > 32.20
+    -> ORDER BY Fare DESC
+    -> LIMIT 10;
+Empty set (0.00 sec)
+
+mysql> SELECT
+    ->     PassengerId,
+    ->     Survived,
+    ->     Pclass,
+    ->     Name,
+    ->     Sex,
+    ->     Age,
+    ->     Fare,
+    ->     Embarked
+    -> FROM krish_data
+    -> LIMIT 5;
++-------------+----------+--------+-----------------------------------------------------+--------+-------+---------+----------+
+| PassengerId | Survived | Pclass | Name                                                | Sex    | Age   | Fare    | Embarked |
++-------------+----------+--------+-----------------------------------------------------+--------+-------+---------+----------+
+       |    1 |        0 |      3 | Braund, Mr. Owen Harris                             | male   | 22.00 |  7.2500 | S
+       |    2 |        1 |      1 | Cumings, Mrs. John Bradley (Florence Briggs Thayer) | female | 38.00 | 71.2833 | C
+       |    3 |        1 |      3 | Heikkinen, Miss. Laina                              | female | 26.00 |  7.9250 | S
+       |    4 |        1 |      1 | Futrelle, Mrs. Jacques Heath (Lily May Peel)        | female | 35.00 | 53.1000 | S
+       |    5 |        0 |      3 | Allen, Mr. William Henry                            | male   | 35.00 |  8.0500 | S
++-------------+----------+--------+-----------------------------------------------------+--------+-------+---------+----------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT ROUND(AVG(Fare), 2) AS average_fare
+    -> FROM krish_data;
++--------------+
+| average_fare |
++--------------+
+|        32.20 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> DROP TABLE IF EXISTS passengers;
+Query OK, 0 rows affected (0.07 sec)
+
+mysql>
+mysql> CREATE TABLE passengers AS
+    -> SELECT
+    ->     PassengerId,
+    ->     Name,
+    ->     Sex,
+    ->     Age,
+    ->     SibSp,
+    ->     Parch
+    -> FROM krish_data;
+Query OK, 891 rows affected (0.13 sec)
+Records: 891  Duplicates: 0  Warnings: 0
+
+mysql> DROP TABLE IF EXISTS journey_details;
+Query OK, 0 rows affected (0.07 sec)
+
+mysql>
+mysql> CREATE TABLE journey_details AS
+    -> SELECT
+    ->     PassengerId,
+    ->     Survived,
+    ->     Pclass,
+    ->     Ticket,
+    ->     Fare,
+    ->     Embarked
+    -> FROM krish_data;
+Query OK, 891 rows affected (0.13 sec)
+Records: 891  Duplicates: 0  Warnings: 0
+
+mysql> SELECT ROUND(AVG(Fare), 2) AS average_fare
+    -> FROM journey_details;
++--------------+
+| average_fare |
++--------------+
+|        32.20 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT
+    ->     PassengerId,
+    ->     Survived,
+    ->     Pclass,
+    ->     Fare
+    -> FROM journey_details
+    -> LIMIT 5;
++-------------+----------+--------+---------+
+| PassengerId | Survived | Pclass | Fare    |
++-------------+----------+--------+---------+
+|           1 |        0 |      3 |  7.2500 |
+|           2 |        1 |      1 | 71.2833 |
+|           3 |        1 |      3 |  7.9250 |
+|           4 |        1 |      1 | 53.1000 |
+|           5 |        0 |      3 |  8.0500 |
++-------------+----------+--------+---------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     p.PassengerId,
+    ->     p.Name,
+    ->     p.Sex,
+    ->     j.Pclass,
+    ->     j.Fare,
+    ->     j.Survived
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> WHERE j.Fare > (
+    ->     SELECT AVG(Fare)
+    ->     FROM journey_details
+    -> )
+    -> AND j.Survived = 1
+    -> ORDER BY j.Fare DESC;
++-------------+------------------------------------------------------------------------------------+--------+--------+----------+----------+
+| PassengerId | Name                                                                               | Sex    | Pclass | Fare     | Survived |
++-------------+------------------------------------------------------------------------------------+--------+--------+----------+----------+
+|         259 | Ward, Miss. Anna                                                                   | female |      1 | 512.3292 |        1 |
+|         680 | Cardeza, Mr. Thomas Drake Martinez                                                 | male   |      1 | 512.3292 |        1 |
+|         738 | Lesurer, Mr. Gustave J                                                             | male   |      1 | 512.3292 |        1 |
+|          89 | Fortune, Miss. Mabel Helen                                                         | female |      1 | 263.0000 |        1 |
+|         342 | Fortune, Miss. Alice Elizabeth                                                     | female |      1 | 263.0000 |        1 |
+|         312 | Ryerson, Miss. Emily Borie                                                         | female |      1 | 262.3750 |        1 |
+|         743 | Ryerson, Miss. Susan Parker "Suzette"                                              | female |      1 | 262.3750 |        1 |
+|         300 | Baxter, Mrs. James (Helene DeLaudeniere Chaput)                                    | female |      1 | 247.5208 |        1 |
+|         381 | Bidois, Miss. Rosalie                                                              | female |      1 | 227.5250 |        1 |
+|         701 | Astor, Mrs. John Jacob (Madeleine Talmadge Force)                                  | female |      1 | 227.5250 |        1 |
+|         717 | Endres, Miss. Caroline Louise                                                      | female |      1 | 227.5250 |        1 |
+|         690 | Madill, Miss. Georgette Alexandra                                                  | female |      1 | 211.3375 |        1 |
+|         731 | Allen, Miss. Elisabeth Walton                                                      | female |      1 | 211.3375 |        1 |
+|         780 | Robert, Mrs. Edward Scott (Elisabeth Walton McMillan)                              | female |      1 | 211.3375 |        1 |
+|         319 | Wick, Miss. Mary Natalie                                                           | female |      1 | 164.8667 |        1 |
+|         857 | Wick, Mrs. George Dennick (Mary Hitchcock)                                         | female |      1 | 164.8667 |        1 |
+|         269 | Graham, Mrs. William Thompson (Edith Junkins)                                      | female |      1 | 153.4625 |        1 |
+|         610 | Shutes, Miss. Elizabeth W                                                          | female |      1 | 153.4625 |        1 |
+|         306 | Allison, Master. Hudson Trevor                                                     | male   |      1 | 151.5500 |        1 |
+|         709 | Cleaver, Miss. Alice                                                               | female |      1 | 151.5500 |        1 |
+|          32 | Spencer, Mrs. William Augustus (Marie Eugenie)                                     | female |      1 | 146.5208 |        1 |
+|         196 | Lurette, Miss. Elise                                                               | female |      1 | 146.5208 |        1 |
+|         270 | Bissette, Miss. Amelia                                                             | female |      1 | 135.6333 |        1 |
+|         326 | Young, Miss. Marie Grice                                                           | female |      1 | 135.6333 |        1 |
+|         320 | Spedden, Mrs. Frederic Oakley (Margaretta Corning Stone)                           | female |      1 | 134.5000 |        1 |
+|         338 | Burns, Miss. Elizabeth Margaret                                                    | female |      1 | 134.5000 |        1 |
+|         335 | Frauenthal, Mrs. Henry William (Clara Heinsheimer)                                 | female |      1 | 133.6500 |        1 |
+|         661 | Frauenthal, Dr. Henry William                                                      | male   |      1 | 133.6500 |        1 |
+|         391 | Carter, Mr. William Ernest                                                         | male   |      1 | 120.0000 |        1 |
+|         436 | Carter, Miss. Lucile Polk                                                          | female |      1 | 120.0000 |        1 |
+|         764 | Carter, Mrs. William Ernest (Lucile Polk)                                          | female |      1 | 120.0000 |        1 |
+|         803 | Carter, Master. William Thornton II                                                | male   |      1 | 120.0000 |        1 |
+|         216 | Newell, Miss. Madeleine                                                            | female |      1 | 113.2750 |        1 |
+|         394 | Newell, Miss. Marjorie                                                             | female |      1 | 113.2750 |        1 |
+|         307 | Fleming, Miss. Margaret                                                            | female |      1 | 110.8833 |        1 |
+|         551 | Thayer, Mr. John Borland Jr                                                        | male   |      1 | 110.8833 |        1 |
+|         582 | Thayer, Mrs. John Borland (Marian Longstreth Morris)                               | female |      1 | 110.8833 |        1 |
+|         308 | Penasco y Castellana, Mrs. Victor de Satode (Maria Josefa Perez de Soto y Vallejo) | female |      1 | 108.9000 |        1 |
+|         538 | LeRoy, Miss. Bertha                                                                | female |      1 | 106.4250 |        1 |
+|         521 | Perreault, Miss. Anne                                                              | female |      1 |  93.5000 |        1 |
+|         821 | Hays, Mrs. Charles Melville (Clara Jennings Gregg)                                 | female |      1 |  93.5000 |        1 |
+|         292 | Bishop, Mrs. Dickinson H (Helen Walton)                                            | female |      1 |  91.0792 |        1 |
+|         485 | Bishop, Mr. Dickinson H                                                            | male   |      1 |  91.0792 |        1 |
+|         225 | Hoyt, Mr. Frederick Maxfield                                                       | male   |      1 |  90.0000 |        1 |
+|         413 | Minahan, Miss. Daisy E                                                             | female |      1 |  90.0000 |        1 |
+|         487 | Hoyt, Mrs. Frederick Maxfield (Jane Anne Forby)                                    | female |      1 |  90.0000 |        1 |
+|         454 | Goldenberg, Mr. Samuel L                                                           | male   |      1 |  89.1042 |        1 |
+|         850 | Goldenberg, Mrs. Samuel L (Edwiga Grabowska)                                       | female |      1 |  89.1042 |        1 |
+|         258 | Cherry, Miss. Gladys                                                               | female |      1 |  86.5000 |        1 |
+|         505 | Maioni, Miss. Roberta                                                              | female |      1 |  86.5000 |        1 |
+|         760 | Rothes, the Countess. of (Lucy Noel Martha Dyer-Edwards)                           | female |      1 |  86.5000 |        1 |
+|         231 | Harris, Mrs. Henry Birkhardt (Irene Wallach)                                       | female |      1 |  83.4750 |        1 |
+|         311 | Hays, Miss. Margaret Bechstein                                                     | female |      1 |  83.1583 |        1 |
+|         836 | Compton, Miss. Sara Rebecca                                                        | female |      1 |  83.1583 |        1 |
+|         880 | Potter, Mrs. Thomas Jr (Lily Alexenia Wilson)                                      | female |      1 |  83.1583 |        1 |
+|         376 | Meyer, Mrs. Edgar Joseph (Leila Saks)                                              | female |      1 |  82.1708 |        1 |
+|         446 | Dodge, Master. Washington                                                          | male   |      1 |  81.8583 |        1 |
+|          62 | Icard, Miss. Amelie                                                                | female |      1 |  80.0000 |        1 |
+|         830 | Stone, Mrs. George Nelson (Martha Evelyn)                                          | female |      1 |  80.0000 |        1 |
+|         559 | Taussig, Mrs. Emil (Tillie Mandelbaum)                                             | female |      1 |  79.6500 |        1 |
+|         586 | Taussig, Miss. Ruth                                                                | female |      1 |  79.6500 |        1 |
+|         257 | Thorne, Mrs. Gertrude Maybelle                                                     | female |      1 |  79.2000 |        1 |
+|         588 | Frolicher-Stehli, Mr. Maxmillian                                                   | male   |      1 |  79.2000 |        1 |
+|         291 | Barber, Miss. Ellen "Nellie"                                                       | female |      1 |  78.8500 |        1 |
+|         497 | Eustis, Miss. Elizabeth Mussey                                                     | female |      1 |  78.2667 |        1 |
+|         592 | Stephenson, Mrs. Walter Bertram (Martha Eustis)                                    | female |      1 |  78.2667 |        1 |
+|         276 | Andrews, Miss. Kornelia Theodosia                                                  | female |      1 |  77.9583 |        1 |
+|         628 | Longley, Miss. Gretchen Fiske                                                      | female |      1 |  77.9583 |        1 |
+|         766 | Hogeboom, Mrs. John C (Anna Andrews)                                               | female |      1 |  77.9583 |        1 |
+|          53 | Harper, Mrs. Henry Sleeper (Myna Haxtun)                                           | female |      1 |  76.7292 |        1 |
+|         646 | Harper, Mr. Henry Sleeper                                                          | male   |      1 |  76.7292 |        1 |
+|         682 | Hassab, Mr. Hammad                                                                 | male   |      1 |  76.7292 |        1 |
+|         219 | Bazzani, Miss. Albina                                                              | female |      1 |  76.2917 |        1 |
+|         367 | Warren, Mrs. Frank Manley (Anna Sophia Atkinson)                                   | female |      1 |  75.2500 |        1 |
+|           2 | Cumings, Mrs. John Bradley (Florence Briggs Thayer)                                | female |      1 |  71.2833 |        1 |
+|         541 | Crosby, Miss. Harriet R                                                            | female |      1 |  71.0000 |        1 |
+|         370 | Aubart, Mme. Leontine Pauline                                                      | female |      1 |  69.3000 |        1 |
+|         642 | Sagesser, Mlle. Emma                                                               | female |      1 |  69.3000 |        1 |
+|         152 | Pears, Mrs. Thomas (Edith Wearne)                                                  | female |      1 |  66.6000 |        1 |
+|         616 | Herman, Miss. Alice                                                                | female |      2 |  65.0000 |        1 |
+|         755 | Herman, Mrs. Samuel (Jane Laver)                                                   | female |      2 |  65.0000 |        1 |
+|          98 | Greenfield, Mr. William Bertram                                                    | male   |      1 |  63.3583 |        1 |
+|         514 | Rothschild, Mrs. Martin (Elizabeth L. Barrett)                                     | female |      1 |  59.4000 |        1 |
+|         330 | Hippach, Miss. Jean Gertrude                                                       | female |      1 |  57.9792 |        1 |
+|         524 | Hippach, Mrs. Louis Albert (Ida Sophia Fischer)                                    | female |      1 |  57.9792 |        1 |
+|         691 | Dick, Mr. Albert Adrian                                                            | male   |      1 |  57.0000 |        1 |
+|         782 | Dick, Mrs. Albert Adrian (Vera Gillespie)                                          | female |      1 |  57.0000 |        1 |
+|         310 | Francatelli, Miss. Laura Mabel                                                     | female |      1 |  56.9292 |        1 |
+|         600 | Duff Gordon, Sir. Cosmo Edmund ("Mr Morgan")                                       | male   |      1 |  56.9292 |        1 |
+|          75 | Bing, Mr. Lee                                                                      | male   |      3 |  56.4958 |        1 |
+|         510 | Lang, Mr. Fang                                                                     | male   |      3 |  56.4958 |        1 |
+|         644 | Foo, Mr. Choong                                                                    | male   |      3 |  56.4958 |        1 |
+|         693 | Lam, Mr. Ali                                                                       | male   |      3 |  56.4958 |        1 |
+|         839 | Chip, Mr. Chang                                                                    | male   |      3 |  56.4958 |        1 |
+|         578 | Silvey, Mrs. William Baird (Alice Munger)                                          | female |      1 |  55.9000 |        1 |
+|         371 | Harder, Mr. George Achilles                                                        | male   |      1 |  55.4417 |        1 |
+|         167 | Chibnall, Mrs. (Edith Martha Bowerman)                                             | female |      1 |  55.0000 |        1 |
+|         357 | Bowerman, Miss. Elsie Edith                                                        | female |      1 |  55.0000 |        1 |
+|           4 | Futrelle, Mrs. Jacques Heath (Lily May Peel)                                       | female |      1 |  53.1000 |        1 |
+|         725 | Chambers, Mr. Norman Campbell                                                      | male   |      1 |  53.1000 |        1 |
+|         810 | Chambers, Mrs. Norman Campbell (Bertha Griggs)                                     | female |      1 |  53.1000 |        1 |
+|         249 | Beckwith, Mr. Richard Leonard                                                      | male   |      1 |  52.5542 |        1 |
+|         622 | Kimball, Mr. Edwin Nelson Jr                                                       | male   |      1 |  52.5542 |        1 |
+|         872 | Beckwith, Mrs. Richard Leonard (Sallie Monypeny)                                   | female |      1 |  52.5542 |        1 |
+|         384 | Holverson, Mrs. Alexander Oskar (Mary Aline Towner)                                | female |      1 |  52.0000 |        1 |
+|         670 | Taylor, Mrs. Elmer Zebley (Juliet Cummins Wright)                                  | female |      1 |  52.0000 |        1 |
+|         713 | Taylor, Mr. Elmer Zebley                                                           | male   |      1 |  52.0000 |        1 |
+|         458 | Kenyon, Mrs. Frederick R (Marion)                                                  | female |      1 |  51.8625 |        1 |
+|         572 | Appleton, Mrs. Edward Dale (Charlotte Lamson)                                      | female |      1 |  51.4792 |        1 |
+|         711 | Mayne, Mlle. Berthe Antonine ("Mrs de Villiers")                                   | female |      1 |  49.5042 |        1 |
+|         540 | Frolicher, Miss. Hedwig Margaritha                                                 | female |      1 |  49.5000 |        1 |
+|          44 | Laroche, Miss. Simonne Marie Anne Andree                                           | female |      2 |  41.5792 |        1 |
+|         609 | Laroche, Mrs. Joseph (Juliette Marie Louise Lafargue)                              | female |      2 |  41.5792 |        1 |
+|         557 | Duff Gordon, Lady. (Lucille Christiana Sutherland) ("Mrs Morgan")                  | female |      1 |  39.6000 |        1 |
+|         854 | Lines, Miss. Mary Conover                                                          | female |      1 |  39.4000 |        1 |
+|         184 | Becker, Master. Richard F                                                          | male   |      2 |  39.0000 |        1 |
+|         619 | Becker, Miss. Marion Louise                                                        | female |      2 |  39.0000 |        1 |
+|         671 | Brown, Mrs. Thomas William Solomon (Elizabeth Catherine Ford)                      | female |      2 |  39.0000 |        1 |
+|         828 | Mallet, Master. Andre                                                              | male   |      2 |  37.0042 |        1 |
+|         550 | Davies, Master. John Morgan Jr                                                     | male   |      2 |  36.7500 |        1 |
+|          24 | Sloper, Mr. William Thompson                                                       | male   |      1 |  35.5000 |        1 |
+|          56 | Woolner, Mr. Hugh                                                                  | male   |      1 |  35.5000 |        1 |
+|         648 | Simonius-Blumer, Col. Oberst Alfons                                                | male   |      1 |  35.5000 |        1 |
+|         597 | Leitch, Miss. Jessie Wills                                                         | female |      2 |  33.0000 |        1 |
+|         721 | Harper, Miss. Annie Jessie "Nina"                                                  | female |      2 |  33.0000 |        1 |
+|         417 | Drew, Mrs. James Vivian (Lulu Thorne Christian)                                    | female |      2 |  32.5000 |        1 |
++-------------+------------------------------------------------------------------------------------+--------+--------+----------+----------+
+126 rows in set (0.01 sec)
+
+mysql> SELECT
+    ->     p.PassengerId,
+    ->     p.Name,
+    ->     p.Sex,
+    ->     j.Pclass,
+    ->     j.Fare,
+    ->     j.Survived
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> WHERE j.Fare > (
+    ->     SELECT AVG(Fare)
+    ->     FROM journey_details
+    -> )
+    -> AND j.Survived = 1
+    -> ORDER BY j.Fare DESC;
++-------------+------------------------------------------------------------------------------------+--------+--------+----------+----------+
+| PassengerId | Name                                                                               | Sex    | Pclass | Fare     | Survived |
++-------------+------------------------------------------------------------------------------------+--------+--------+----------+----------+
+|         259 | Ward, Miss. Anna                                                                   | female |      1 | 512.3292 |        1 |
+|         680 | Cardeza, Mr. Thomas Drake Martinez                                                 | male   |      1 | 512.3292 |        1 |
+|         738 | Lesurer, Mr. Gustave J                                                             | male   |      1 | 512.3292 |        1 |
+|          89 | Fortune, Miss. Mabel Helen                                                         | female |      1 | 263.0000 |        1 |
+|         342 | Fortune, Miss. Alice Elizabeth                                                     | female |      1 | 263.0000 |        1 |
+|         312 | Ryerson, Miss. Emily Borie                                                         | female |      1 | 262.3750 |        1 |
+|         743 | Ryerson, Miss. Susan Parker "Suzette"                                              | female |      1 | 262.3750 |        1 |
+|         300 | Baxter, Mrs. James (Helene DeLaudeniere Chaput)                                    | female |      1 | 247.5208 |        1 |
+|         381 | Bidois, Miss. Rosalie                                                              | female |      1 | 227.5250 |        1 |
+|         701 | Astor, Mrs. John Jacob (Madeleine Talmadge Force)                                  | female |      1 | 227.5250 |        1 |
+|         717 | Endres, Miss. Caroline Louise                                                      | female |      1 | 227.5250 |        1 |
+|         690 | Madill, Miss. Georgette Alexandra                                                  | female |      1 | 211.3375 |        1 |
+|         731 | Allen, Miss. Elisabeth Walton                                                      | female |      1 | 211.3375 |        1 |
+|         780 | Robert, Mrs. Edward Scott (Elisabeth Walton McMillan)                              | female |      1 | 211.3375 |        1 |
+|         319 | Wick, Miss. Mary Natalie                                                           | female |      1 | 164.8667 |        1 |
+|         857 | Wick, Mrs. George Dennick (Mary Hitchcock)                                         | female |      1 | 164.8667 |        1 |
+|         269 | Graham, Mrs. William Thompson (Edith Junkins)                                      | female |      1 | 153.4625 |        1 |
+|         610 | Shutes, Miss. Elizabeth W                                                          | female |      1 | 153.4625 |        1 |
+|         306 | Allison, Master. Hudson Trevor                                                     | male   |      1 | 151.5500 |        1 |
+|         709 | Cleaver, Miss. Alice                                                               | female |      1 | 151.5500 |        1 |
+|          32 | Spencer, Mrs. William Augustus (Marie Eugenie)                                     | female |      1 | 146.5208 |        1 |
+|         196 | Lurette, Miss. Elise                                                               | female |      1 | 146.5208 |        1 |
+|         270 | Bissette, Miss. Amelia                                                             | female |      1 | 135.6333 |        1 |
+|         326 | Young, Miss. Marie Grice                                                           | female |      1 | 135.6333 |        1 |
+|         320 | Spedden, Mrs. Frederic Oakley (Margaretta Corning Stone)                           | female |      1 | 134.5000 |        1 |
+|         338 | Burns, Miss. Elizabeth Margaret                                                    | female |      1 | 134.5000 |        1 |
+|         335 | Frauenthal, Mrs. Henry William (Clara Heinsheimer)                                 | female |      1 | 133.6500 |        1 |
+|         661 | Frauenthal, Dr. Henry William                                                      | male   |      1 | 133.6500 |        1 |
+|         391 | Carter, Mr. William Ernest                                                         | male   |      1 | 120.0000 |        1 |
+|         436 | Carter, Miss. Lucile Polk                                                          | female |      1 | 120.0000 |        1 |
+|         764 | Carter, Mrs. William Ernest (Lucile Polk)                                          | female |      1 | 120.0000 |        1 |
+|         803 | Carter, Master. William Thornton II                                                | male   |      1 | 120.0000 |        1 |
+|         216 | Newell, Miss. Madeleine                                                            | female |      1 | 113.2750 |        1 |
+|         394 | Newell, Miss. Marjorie                                                             | female |      1 | 113.2750 |        1 |
+|         307 | Fleming, Miss. Margaret                                                            | female |      1 | 110.8833 |        1 |
+|         551 | Thayer, Mr. John Borland Jr                                                        | male   |      1 | 110.8833 |        1 |
+|         582 | Thayer, Mrs. John Borland (Marian Longstreth Morris)                               | female |      1 | 110.8833 |        1 |
+|         308 | Penasco y Castellana, Mrs. Victor de Satode (Maria Josefa Perez de Soto y Vallejo) | female |      1 | 108.9000 |        1 |
+|         538 | LeRoy, Miss. Bertha                                                                | female |      1 | 106.4250 |        1 |
+|         521 | Perreault, Miss. Anne                                                              | female |      1 |  93.5000 |        1 |
+|         821 | Hays, Mrs. Charles Melville (Clara Jennings Gregg)                                 | female |      1 |  93.5000 |        1 |
+|         292 | Bishop, Mrs. Dickinson H (Helen Walton)                                            | female |      1 |  91.0792 |        1 |
+|         485 | Bishop, Mr. Dickinson H                                                            | male   |      1 |  91.0792 |        1 |
+|         225 | Hoyt, Mr. Frederick Maxfield                                                       | male   |      1 |  90.0000 |        1 |
+|         413 | Minahan, Miss. Daisy E                                                             | female |      1 |  90.0000 |        1 |
+|         487 | Hoyt, Mrs. Frederick Maxfield (Jane Anne Forby)                                    | female |      1 |  90.0000 |        1 |
+|         454 | Goldenberg, Mr. Samuel L                                                           | male   |      1 |  89.1042 |        1 |
+|         850 | Goldenberg, Mrs. Samuel L (Edwiga Grabowska)                                       | female |      1 |  89.1042 |        1 |
+|         258 | Cherry, Miss. Gladys                                                               | female |      1 |  86.5000 |        1 |
+|         505 | Maioni, Miss. Roberta                                                              | female |      1 |  86.5000 |        1 |
+|         760 | Rothes, the Countess. of (Lucy Noel Martha Dyer-Edwards)                           | female |      1 |  86.5000 |        1 |
+|         231 | Harris, Mrs. Henry Birkhardt (Irene Wallach)                                       | female |      1 |  83.4750 |        1 |
+|         311 | Hays, Miss. Margaret Bechstein                                                     | female |      1 |  83.1583 |        1 |
+|         836 | Compton, Miss. Sara Rebecca                                                        | female |      1 |  83.1583 |        1 |
+|         880 | Potter, Mrs. Thomas Jr (Lily Alexenia Wilson)                                      | female |      1 |  83.1583 |        1 |
+|         376 | Meyer, Mrs. Edgar Joseph (Leila Saks)                                              | female |      1 |  82.1708 |        1 |
+|         446 | Dodge, Master. Washington                                                          | male   |      1 |  81.8583 |        1 |
+|          62 | Icard, Miss. Amelie                                                                | female |      1 |  80.0000 |        1 |
+|         830 | Stone, Mrs. George Nelson (Martha Evelyn)                                          | female |      1 |  80.0000 |        1 |
+|         559 | Taussig, Mrs. Emil (Tillie Mandelbaum)                                             | female |      1 |  79.6500 |        1 |
+|         586 | Taussig, Miss. Ruth                                                                | female |      1 |  79.6500 |        1 |
+|         257 | Thorne, Mrs. Gertrude Maybelle                                                     | female |      1 |  79.2000 |        1 |
+|         588 | Frolicher-Stehli, Mr. Maxmillian                                                   | male   |      1 |  79.2000 |        1 |
+|         291 | Barber, Miss. Ellen "Nellie"                                                       | female |      1 |  78.8500 |        1 |
+|         497 | Eustis, Miss. Elizabeth Mussey                                                     | female |      1 |  78.2667 |        1 |
+|         592 | Stephenson, Mrs. Walter Bertram (Martha Eustis)                                    | female |      1 |  78.2667 |        1 |
+|         276 | Andrews, Miss. Kornelia Theodosia                                                  | female |      1 |  77.9583 |        1 |
+|         628 | Longley, Miss. Gretchen Fiske                                                      | female |      1 |  77.9583 |        1 |
+|         766 | Hogeboom, Mrs. John C (Anna Andrews)                                               | female |      1 |  77.9583 |        1 |
+|          53 | Harper, Mrs. Henry Sleeper (Myna Haxtun)                                           | female |      1 |  76.7292 |        1 |
+|         646 | Harper, Mr. Henry Sleeper                                                          | male   |      1 |  76.7292 |        1 |
+|         682 | Hassab, Mr. Hammad                                                                 | male   |      1 |  76.7292 |        1 |
+|         219 | Bazzani, Miss. Albina                                                              | female |      1 |  76.2917 |        1 |
+|         367 | Warren, Mrs. Frank Manley (Anna Sophia Atkinson)                                   | female |      1 |  75.2500 |        1 |
+|           2 | Cumings, Mrs. John Bradley (Florence Briggs Thayer)                                | female |      1 |  71.2833 |        1 |
+|         541 | Crosby, Miss. Harriet R                                                            | female |      1 |  71.0000 |        1 |
+|         370 | Aubart, Mme. Leontine Pauline                                                      | female |      1 |  69.3000 |        1 |
+|         642 | Sagesser, Mlle. Emma                                                               | female |      1 |  69.3000 |        1 |
+|         152 | Pears, Mrs. Thomas (Edith Wearne)                                                  | female |      1 |  66.6000 |        1 |
+|         616 | Herman, Miss. Alice                                                                | female |      2 |  65.0000 |        1 |
+|         755 | Herman, Mrs. Samuel (Jane Laver)                                                   | female |      2 |  65.0000 |        1 |
+|          98 | Greenfield, Mr. William Bertram                                                    | male   |      1 |  63.3583 |        1 |
+|         514 | Rothschild, Mrs. Martin (Elizabeth L. Barrett)                                     | female |      1 |  59.4000 |        1 |
+|         330 | Hippach, Miss. Jean Gertrude                                                       | female |      1 |  57.9792 |        1 |
+|         524 | Hippach, Mrs. Louis Albert (Ida Sophia Fischer)                                    | female |      1 |  57.9792 |        1 |
+|         691 | Dick, Mr. Albert Adrian                                                            | male   |      1 |  57.0000 |        1 |
+|         782 | Dick, Mrs. Albert Adrian (Vera Gillespie)                                          | female |      1 |  57.0000 |        1 |
+|         310 | Francatelli, Miss. Laura Mabel                                                     | female |      1 |  56.9292 |        1 |
+|         600 | Duff Gordon, Sir. Cosmo Edmund ("Mr Morgan")                                       | male   |      1 |  56.9292 |        1 |
+|          75 | Bing, Mr. Lee                                                                      | male   |      3 |  56.4958 |        1 |
+|         510 | Lang, Mr. Fang                                                                     | male   |      3 |  56.4958 |        1 |
+|         644 | Foo, Mr. Choong                                                                    | male   |      3 |  56.4958 |        1 |
+|         693 | Lam, Mr. Ali                                                                       | male   |      3 |  56.4958 |        1 |
+|         839 | Chip, Mr. Chang                                                                    | male   |      3 |  56.4958 |        1 |
+|         578 | Silvey, Mrs. William Baird (Alice Munger)                                          | female |      1 |  55.9000 |        1 |
+|         371 | Harder, Mr. George Achilles                                                        | male   |      1 |  55.4417 |        1 |
+|         167 | Chibnall, Mrs. (Edith Martha Bowerman)                                             | female |      1 |  55.0000 |        1 |
+|         357 | Bowerman, Miss. Elsie Edith                                                        | female |      1 |  55.0000 |        1 |
+|           4 | Futrelle, Mrs. Jacques Heath (Lily May Peel)                                       | female |      1 |  53.1000 |        1 |
+|         725 | Chambers, Mr. Norman Campbell                                                      | male   |      1 |  53.1000 |        1 |
+|         810 | Chambers, Mrs. Norman Campbell (Bertha Griggs)                                     | female |      1 |  53.1000 |        1 |
+|         249 | Beckwith, Mr. Richard Leonard                                                      | male   |      1 |  52.5542 |        1 |
+|         622 | Kimball, Mr. Edwin Nelson Jr                                                       | male   |      1 |  52.5542 |        1 |
+|         872 | Beckwith, Mrs. Richard Leonard (Sallie Monypeny)                                   | female |      1 |  52.5542 |        1 |
+|         384 | Holverson, Mrs. Alexander Oskar (Mary Aline Towner)                                | female |      1 |  52.0000 |        1 |
+|         670 | Taylor, Mrs. Elmer Zebley (Juliet Cummins Wright)                                  | female |      1 |  52.0000 |        1 |
+|         713 | Taylor, Mr. Elmer Zebley                                                           | male   |      1 |  52.0000 |        1 |
+|         458 | Kenyon, Mrs. Frederick R (Marion)                                                  | female |      1 |  51.8625 |        1 |
+|         572 | Appleton, Mrs. Edward Dale (Charlotte Lamson)                                      | female |      1 |  51.4792 |        1 |
+|         711 | Mayne, Mlle. Berthe Antonine ("Mrs de Villiers")                                   | female |      1 |  49.5042 |        1 |
+|         540 | Frolicher, Miss. Hedwig Margaritha                                                 | female |      1 |  49.5000 |        1 |
+|          44 | Laroche, Miss. Simonne Marie Anne Andree                                           | female |      2 |  41.5792 |        1 |
+|         609 | Laroche, Mrs. Joseph (Juliette Marie Louise Lafargue)                              | female |      2 |  41.5792 |        1 |
+|         557 | Duff Gordon, Lady. (Lucille Christiana Sutherland) ("Mrs Morgan")                  | female |      1 |  39.6000 |        1 |
+|         854 | Lines, Miss. Mary Conover                                                          | female |      1 |  39.4000 |        1 |
+|         184 | Becker, Master. Richard F                                                          | male   |      2 |  39.0000 |        1 |
+|         619 | Becker, Miss. Marion Louise                                                        | female |      2 |  39.0000 |        1 |
+|         671 | Brown, Mrs. Thomas William Solomon (Elizabeth Catherine Ford)                      | female |      2 |  39.0000 |        1 |
+|         828 | Mallet, Master. Andre                                                              | male   |      2 |  37.0042 |        1 |
+|         550 | Davies, Master. John Morgan Jr                                                     | male   |      2 |  36.7500 |        1 |
+|          24 | Sloper, Mr. William Thompson                                                       | male   |      1 |  35.5000 |        1 |
+|          56 | Woolner, Mr. Hugh                                                                  | male   |      1 |  35.5000 |        1 |
+|         648 | Simonius-Blumer, Col. Oberst Alfons                                                | male   |      1 |  35.5000 |        1 |
+|         597 | Leitch, Miss. Jessie Wills                                                         | female |      2 |  33.0000 |        1 |
+|         721 | Harper, Miss. Annie Jessie "Nina"                                                  | female |      2 |  33.0000 |        1 |
+|         417 | Drew, Mrs. James Vivian (Lulu Thorne Christian)                                    | female |      2 |  32.5000 |        1 |
++-------------+------------------------------------------------------------------------------------+--------+--------+----------+----------+
+126 rows in set (0.01 sec)
+
+mysql> SELECT
+    ->     j.Pclass,
+    ->     COUNT(*) AS total_passengers
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> GROUP BY j.Pclass
+    -> HAVING COUNT(*) > 100
+    -> ORDER BY total_passengers DESC;
++--------+------------------+
+| Pclass | total_passengers |
++--------+------------------+
+|      3 |              491 |
+|      1 |              216 |
+|      2 |              184 |
++--------+------------------+
+3 rows in set (0.01 sec)
+
+mysql> SELECT COUNT(*) AS joined_rows
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId;
++-------------+
+| joined_rows |
++-------------+
+|         891 |
++-------------+
+1 row in set (0.01 sec)
+
+mysql> SELECT
+    ->     Survived,
+    ->     COUNT(*) AS passenger_count
+    -> FROM krish_data
+    -> GROUP BY Survived
+    -> ORDER BY Survived;
++----------+-----------------+
+| Survived | passenger_count |
++----------+-----------------+
+|        0 |             549 |
+|        1 |             342 |
++----------+-----------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     p.Sex,
+    ->     COUNT(*) AS total_passengers,
+    ->     SUM(j.Survived) AS survivors
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> GROUP BY p.Sex;
++--------+------------------+-----------+
+| Sex    | total_passengers | survivors |
++--------+------------------+-----------+
+| male   |              577 |       109 |
+| female |              314 |       233 |
++--------+------------------+-----------+
+2 rows in set (0.01 sec)
+
+mysql> SELECT
+    ->     j.Pclass,
+    ->     COUNT(*) AS total_passengers,
+    ->     SUM(j.Survived) AS survivors
+    -> FROM passengers p
+    -> INNER JOIN journey_details j
+    ->     ON p.PassengerId = j.PassengerId
+    -> GROUP BY j.Pclass
+    -> ORDER BY j.Pclass;
++--------+------------------+-----------+
+| Pclass | total_passengers | survivors |
++--------+------------------+-----------+
+|      1 |              216 |       136 |
+|      2 |              184 |        87 |
+|      3 |              491 |       119 |
++--------+------------------+-----------+
+3 rows in set (0.01 sec)
+
+mysql>
